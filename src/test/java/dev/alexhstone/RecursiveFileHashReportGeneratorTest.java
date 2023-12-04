@@ -22,14 +22,14 @@ class RecursiveFileHashReportGeneratorTest {
     @TempDir
     private Path temporaryDirectory;
 
-    private RecursiveFileHashGenerator reportGenerator;
+    private RecursiveFileHashCalculator reportGenerator;
 
     private FileCreator fileCreator;
 
     @BeforeEach
     void setUp() {
         fileCreator = new FileCreator(temporaryDirectory);
-        reportGenerator = new RecursiveFileHashGenerator();
+        reportGenerator = new RecursiveFileHashCalculator();
     }
 
     @ParameterizedTest

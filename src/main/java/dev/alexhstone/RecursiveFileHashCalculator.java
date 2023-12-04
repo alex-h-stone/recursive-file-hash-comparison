@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class RecursiveFileHashGenerator {
+public class RecursiveFileHashCalculator {
 
-    private final FileHashResultGenerator fileHashResultGenerator;
+    private final FileHashResultCalculator fileHashResultCalculator;
 
-    public RecursiveFileHashGenerator() {
-        fileHashResultGenerator = new FileHashResultGenerator(new HashCalculator());
+    public RecursiveFileHashCalculator() {
+        fileHashResultCalculator = new FileHashResultCalculator(new HashCalculator());
     }
 
     public FolderHierarchy process(String absolutePathToFolder) {
@@ -34,7 +34,7 @@ public class RecursiveFileHashGenerator {
         List<FileHashResult> fileHashResults = pathToWalk.parallel()
                 .map(Path::toFile)
                 .filter(File::isFile)
-                .map(fileHashResultGenerator::process)
+                .map(fileHashResultCalculator::process)
                 .collect(Collectors.toList());
 
         fileHashResults.sort(Comparator.comparing(FileHashResult::getAbsolutePath));

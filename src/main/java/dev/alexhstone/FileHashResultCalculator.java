@@ -10,7 +10,7 @@ import java.io.File;
 import java.math.BigInteger;
 
 @RequiredArgsConstructor
-public class FileHashResultGenerator {
+public class FileHashResultCalculator {
 
     private final HashCalculator hashCalculator;
 

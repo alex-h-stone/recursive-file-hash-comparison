@@ -17,12 +17,12 @@ import java.nio.file.Path;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class FileHashResultGeneratorTest {
+class FileHashResultCalculatorTest {
 
     @TempDir
     private Path temporaryDirectory;
 
-    private FileHashResultGenerator resultGenerator;
+    private FileHashResultCalculator resultGenerator;
     private FileCreator fileCreator;
 
     @BeforeEach
@@ -30,7 +30,7 @@ class FileHashResultGeneratorTest {
         fileCreator = new FileCreator(temporaryDirectory);
 
         HashCalculator hashCalculator = new HashCalculator();
-        resultGenerator = new FileHashResultGenerator(hashCalculator);
+        resultGenerator = new FileHashResultCalculator(hashCalculator);
     }
 
     @Test
