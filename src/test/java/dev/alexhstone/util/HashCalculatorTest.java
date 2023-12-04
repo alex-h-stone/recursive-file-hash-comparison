@@ -1,7 +1,7 @@
-package org.backup.util;
+package dev.alexhstone.util;
 
-import org.backup.exception.InvalidFileException;
-import org.backup.test.util.FileCreator;
+import dev.alexhstone.test.util.FileCreator;
+import dev.alexhstone.exception.InvalidFileException;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.hamcrest.text.IsEmptyString;
@@ -12,8 +12,6 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;

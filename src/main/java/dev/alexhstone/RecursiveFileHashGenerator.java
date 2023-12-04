@@ -1,9 +1,9 @@
-package org.backup;
+package dev.alexhstone;
 
-import org.backup.exception.InvalidFileHashPathException;
-import org.backup.model.FileHashResult;
-import org.backup.model.FolderHierarchy;
-import org.backup.util.HashCalculator;
+import dev.alexhstone.model.FolderHierarchy;
+import dev.alexhstone.exception.InvalidFileHashPathException;
+import dev.alexhstone.model.FileHashResult;
+import dev.alexhstone.util.HashCalculator;
 
 import java.io.File;
 import java.io.IOException;

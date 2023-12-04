@@ -1,4 +1,4 @@
-package org.backup.model;
+package dev.alexhstone.model;
 
 
 import lombok.Builder;

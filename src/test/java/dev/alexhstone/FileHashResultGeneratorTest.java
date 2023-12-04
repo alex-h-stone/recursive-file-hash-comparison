@@ -1,9 +1,9 @@
-package org.backup;
+package dev.alexhstone;
 
-import org.backup.model.FileHashResult;
-import org.backup.model.HashDetails;
-import org.backup.test.util.FileCreator;
-import org.backup.util.HashCalculator;
+import dev.alexhstone.model.FileHashResult;
+import dev.alexhstone.model.HashDetails;
+import dev.alexhstone.test.util.FileCreator;
+import dev.alexhstone.util.HashCalculator;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

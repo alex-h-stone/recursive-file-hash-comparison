@@ -1,10 +1,10 @@
-package org.backup;
+package dev.alexhstone;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
-import org.backup.model.FileHashResult;
-import org.backup.model.HashDetails;
-import org.backup.util.HashCalculator;
+import dev.alexhstone.model.FileHashResult;
+import dev.alexhstone.model.HashDetails;
+import dev.alexhstone.util.HashCalculator;
 
 import java.io.File;
 import java.math.BigInteger;

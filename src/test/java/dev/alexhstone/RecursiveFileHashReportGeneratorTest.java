@@ -1,8 +1,8 @@
-package org.backup;
+package dev.alexhstone;
 
-import org.backup.exception.InvalidFileHashPathException;
-import org.backup.model.FolderHierarchy;
-import org.backup.test.util.FileCreator;
+import dev.alexhstone.model.FolderHierarchy;
+import dev.alexhstone.test.util.FileCreator;
+import dev.alexhstone.exception.InvalidFileHashPathException;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;

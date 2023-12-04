@@ -1,6 +1,6 @@
-package org.backup;
+package dev.alexhstone;
 
-import org.backup.model.FileHashResult;
+import dev.alexhstone.model.FileHashResult;
 
 import java.util.List;
 

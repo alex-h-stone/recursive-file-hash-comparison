@@ -1,7 +1,7 @@
-package org.backup.util;
+package dev.alexhstone.util;
 
 import lombok.extern.slf4j.Slf4j;
-import org.backup.exception.InvalidFileException;
+import dev.alexhstone.exception.InvalidFileException;
 
 import java.io.File;
 import java.io.FileInputStream;
