@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,27 +19,30 @@ public class RecursiveFileHashCalculator {
     private final FileHashResultCalculator fileHashResultCalculator;
 
     public RecursiveFileHashCalculator() {
-        fileHashResultCalculator = new FileHashResultCalculator(new HashCalculator());
+        HashCalculator hashCalculator = new HashCalculator();
+        fileHashResultCalculator = new FileHashResultCalculator(hashCalculator);
     }
 
-    public FolderHierarchy process(String absolutePathToFolder) {
-        Path path = Paths.get(absolutePathToFolder);
-        if (!Files.exists(path)) {
-            String message = "The supplied path [" + absolutePathToFolder + "] does not exist, expected something of the form " +
-                    "C:\\directory. The supplied path was resolved to the absolute path [" + path.toAbsolutePath().toFile().getAbsolutePath() + "]";
+    public FolderHierarchy process(Path absolutePathToWorkingDirectory) {
+        String workingDirectoryPathString = absolutePathToWorkingDirectory.toFile().getAbsolutePath();
+        if (!Files.exists(absolutePathToWorkingDirectory)) {
+            String message = "The supplied path [" + absolutePathToWorkingDirectory + "] does not exist, expected something of the form " +
+                    "C:\\directory. The supplied path was resolved to the absolute path [" + workingDirectoryPathString + "]";
             throw new InvalidFileHashPathException(message);
         }
-        Stream<Path> pathToWalk = walk(path);
+        Stream<Path> pathToWalk = walk(absolutePathToWorkingDirectory);
         List<FileHashResult> fileHashResults = pathToWalk.parallel()
                 .map(Path::toFile)
                 .filter(File::isFile)
-                .map(fileHashResultCalculator::process)
+                .map((File file) ->
+                        fileHashResultCalculator
+                                .process(absolutePathToWorkingDirectory, file))
                 .collect(Collectors.toList());
 
-        fileHashResults.sort(Comparator.comparing(FileHashResult::getAbsolutePath));
+        fileHashResults.sort(Comparator.comparing(FileHashResult::getAbsolutePathToFile));
 
         return FolderHierarchy.builder()
-                .rootFolderAbsolutePath(path.toFile().getAbsolutePath())
+                .absolutePathToWorkingDirectory(workingDirectoryPathString)
                 .fileHashResults(fileHashResults)
                 .build();
     }

@@ -10,12 +10,12 @@ import java.math.BigInteger;
 @Builder
 public class FileHashResult {
 
-    @EqualsAndHashCode.Exclude
-    String absolutePath;
-
-    // TODO add field for relative path to selected directory
-
     String fileName;
+
+    String relativePathToFile;
+
+    @EqualsAndHashCode.Exclude
+    String absolutePathToFile;
 
     BigInteger fileSizeInBytes;
 

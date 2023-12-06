@@ -4,9 +4,12 @@ import dev.alexhstone.model.DiffResults;
 import dev.alexhstone.model.FileHashResult;
 import dev.alexhstone.model.FolderHierarchy;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class DiffResultsCalculator {
@@ -17,7 +20,7 @@ public class DiffResultsCalculator {
     public DiffResults process(FolderHierarchy leftHashResults,
                                FolderHierarchy rightHashResults) {
 
-        Set<FileHashResult> left = new HashSet<>(leftHashResults.getFileHashResults());
+        Set<FileHashResult> left = getFileHashResults(leftHashResults);
         Set<FileHashResult> right = new HashSet<>(rightHashResults.getFileHashResults());
 
         // TODO add validation logic , size as list equals size as set
@@ -38,5 +41,36 @@ public class DiffResultsCalculator {
                 .leftFilesNotPresentInRight(leftFilesNotPresentInRight)
                 .rightFilesNotPresentInLeft(rightFilesNotPresentInLeft)
                 .build();
+    }
+
+    private Set<FileHashResult> getFileHashResults(FolderHierarchy folderHierarchy) {
+        List<FileHashResult> fileHashResultsList = folderHierarchy.getFileHashResults();
+        Set<FileHashResult> fileHashResultsSet = new HashSet<>(fileHashResultsList);
+
+        if (fileHashResultsList.size() == fileHashResultsSet.size()) {
+            return fileHashResultsSet;
+        }
+
+        Map<FileHashResult, Long> countOfFileHashResult = new HashMap<>();
+        for (FileHashResult fileHashResult : fileHashResultsList) {
+            countOfFileHashResult.putIfAbsent(fileHashResult, 0L);
+
+            Long currentCount = countOfFileHashResult.get(fileHashResult);
+            countOfFileHashResult.put(fileHashResult, currentCount + 1);
+        }
+        List<Map.Entry<FileHashResult, Long>> duplicates = countOfFileHashResult
+                .entrySet()
+                .parallelStream()
+                .filter(new Predicate<Map.Entry<FileHashResult, Long>>() {
+                    @Override
+                    public boolean test(Map.Entry<FileHashResult, Long> fileHashResultLongEntry) {
+                        return fileHashResultLongEntry.getValue() > 1;
+                    }
+                })
+                .toList();
+
+        String string = "Expected sizes of List and Set to match, found unexpected equivalent files in fileHashResultsList: [%s]"
+                .formatted(duplicates);
+        throw new IllegalStateException(string);
     }
 }

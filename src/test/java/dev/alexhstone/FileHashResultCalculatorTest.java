@@ -22,28 +22,29 @@ class FileHashResultCalculatorTest {
     @TempDir
     private Path temporaryDirectory;
 
-    private FileHashResultCalculator resultGenerator;
     private FileCreator fileCreator;
+    private FileHashResultCalculator hashGenerator;
 
     @BeforeEach
     void setUp() {
         fileCreator = new FileCreator(temporaryDirectory);
 
         HashCalculator hashCalculator = new HashCalculator();
-        resultGenerator = new FileHashResultCalculator(hashCalculator);
+        hashGenerator = new FileHashResultCalculator(hashCalculator);
     }
 
     @Test
     void shouldCreateFullyPopulatedFileHashResultForFileThatExists() {
         File existingFile = createFileWithContent("existingFile.txt", "Some test file contents");
 
-        FileHashResult actualFileHashResult = resultGenerator.process(existingFile);
+        FileHashResult actualFileHashResult = hashGenerator.process(temporaryDirectory.toAbsolutePath(),
+                existingFile);
         HashDetails actualHashDetails = actualFileHashResult.getHashDetails();
 
         Assertions.assertAll(
                 "Grouped Assertions of FileHashResult",
                 () -> assertEquals("existingFile.txt", actualFileHashResult.getFileName()),
-                () -> assertThat(actualFileHashResult.getAbsolutePath(), Matchers.containsString("existingFile.txt")),
+                () -> assertThat(actualFileHashResult.getAbsolutePathToFile(), Matchers.containsString("existingFile.txt")),
                 () -> assertEquals(BigInteger.valueOf(23), actualFileHashResult.getFileSizeInBytes()),
                 () -> assertEquals("23 bytes", actualFileHashResult.getFileSize()),
                 () -> assertEquals("SHA256", actualHashDetails.getHashingAlgorithmName()),

@@ -12,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,7 +37,7 @@ class RecursiveFileHashReportGeneratorTest {
     @ValueSource(strings = {"unknown_path", "invalid_path",})
     void shouldThrowExceptionIfGivenInvalidPath(String invalidPath) {
         InvalidFileHashPathException invalidFileHashPathException = assertThrows(InvalidFileHashPathException.class,
-                () -> reportGenerator.process(invalidPath));
+                () -> process(invalidPath));
 
         String exceptionMessage = invalidFileHashPathException.getMessage();
         assertThat(exceptionMessage, CoreMatchers.containsString("The supplied path [" + invalidPath + "] does not exist"));
@@ -46,7 +47,7 @@ class RecursiveFileHashReportGeneratorTest {
     @Test
     void shouldThrowExceptionIfGivenInvalidPath() {
         InvalidFileHashPathException invalidFileHashPathException = assertThrows(InvalidFileHashPathException.class,
-                () -> reportGenerator.process("G:\\non-exist"));
+                () -> process("G:\\non-exist"));
 
         assertEquals("The supplied path [G:\\non-exist] does not exist, expected something of the form C:\\directory. The supplied path was resolved to the absolute path [G:\\non-exist]",
                 invalidFileHashPathException.getMessage());
@@ -54,20 +55,20 @@ class RecursiveFileHashReportGeneratorTest {
 
     @Test
     void shouldGenerateAnEmptyListForAnEmptyFolder() {
-        FolderHierarchy results = reportGenerator.process(temporaryDirectory.toFile().getAbsolutePath());
+        FolderHierarchy results = process(temporaryDirectory.toFile().getAbsolutePath());
 
         assertThat(results.getFileHashResults(), Matchers.empty());
-        assertThat(results.getRootFolderAbsolutePath(), Matchers.not(Matchers.isEmptyOrNullString()));
+        assertThat(results.getAbsolutePathToWorkingDirectory(), Matchers.not(Matchers.isEmptyOrNullString()));
     }
 
     @Test
     void shouldGenerateASingleResultForSingleFileInAFolder() {
         createNonEmptyFile("emptyFile.txt");
 
-        FolderHierarchy results = reportGenerator.process(temporaryDirectory.toFile().getAbsolutePath());
+        FolderHierarchy results = process(temporaryDirectory.toFile().getAbsolutePath());
 
         assertThat(results.getFileHashResults(), Matchers.hasSize(1));
-        assertThat(results.getRootFolderAbsolutePath(), Matchers.not(Matchers.isEmptyOrNullString()));
+        assertThat(results.getAbsolutePathToWorkingDirectory(), Matchers.not(Matchers.isEmptyOrNullString()));
     }
 
     @Test
@@ -75,10 +76,14 @@ class RecursiveFileHashReportGeneratorTest {
         createNonEmptyFile("emptyFile1.txt");
         createNonEmptyFile("emptyFile2.txt");
 
-        FolderHierarchy results = reportGenerator.process(temporaryDirectory.toFile().getAbsolutePath());
+        FolderHierarchy results = process(temporaryDirectory.toFile().getAbsolutePath());
 
         assertThat(results.getFileHashResults(), Matchers.hasSize(2));
-        assertThat(results.getRootFolderAbsolutePath(), Matchers.not(Matchers.isEmptyOrNullString()));
+        assertThat(results.getAbsolutePathToWorkingDirectory(), Matchers.not(Matchers.isEmptyOrNullString()));
+    }
+
+    private FolderHierarchy process(String path) {
+        return reportGenerator.process(Paths.get(path));
     }
 
     private void createNonEmptyFile(String file) {
