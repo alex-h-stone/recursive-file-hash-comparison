@@ -1,21 +1,24 @@
 package dev.alexhstone;
 
 import dev.alexhstone.calculator.DiffResultsCalculator;
+import dev.alexhstone.calculator.Location;
 import dev.alexhstone.calculator.RecursiveFileHashCalculator;
 import dev.alexhstone.model.DiffResults;
-import dev.alexhstone.model.FolderHierarchy;
+import dev.alexhstone.storage.FileHashResultRepository;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 public class CompareDirectories {
 
     private final String leftAbsolutePath;
     private final String rightAbsolutePath;
-    private final RecursiveFileHashCalculator recursiveFileHashCalculator = new RecursiveFileHashCalculator();
-    private final PersistToReportDirectoryAsJSON persistToReportDirectoryAsJSON;
+    private final RecursiveFileHashCalculator recursiveFileHashCalculator;
+    private final PersistAsJsonToFile persistAsJSONToFile;
+    private final FileHashResultRepository fileHashResultRepository;
 
     public CompareDirectories(String leftAbsolutePath,
                               String rightAbsolutePath,
@@ -23,44 +26,43 @@ public class CompareDirectories {
         // TODO add validate for methods parameters
         this.leftAbsolutePath = leftAbsolutePath;
         this.rightAbsolutePath = rightAbsolutePath;
-        this.persistToReportDirectoryAsJSON = new PersistToReportDirectoryAsJSON(Paths.get(reportDirectoryAbsolutePath));
+        this.persistAsJSONToFile = new PersistAsJsonToFile(Paths.get(reportDirectoryAbsolutePath));
+        this.fileHashResultRepository = new FileHashResultRepository();
+        this.recursiveFileHashCalculator = new RecursiveFileHashCalculator();
     }
 
     public DiffResults execute() {
+        CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> {
+            calculateAndStoreHashResults(leftAbsolutePath, Location.LEFT);
+        });
 
-        FolderHierarchy folderOneHashResults = calculateFolderHierarchy(leftAbsolutePath,
-                "left");
-        FolderHierarchy folderTwoHashResults = calculateFolderHierarchy(rightAbsolutePath,
-                "right");
+        CompletableFuture<Void> future2 = CompletableFuture.runAsync(() -> {
+            calculateAndStoreHashResults(rightAbsolutePath, Location.RIGHT);
+        });
+
+        CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(future1, future2);
+
+        combinedFuture.join();
+
 
         DiffResultsCalculator diffResultsCalculator = new DiffResultsCalculator();
-        DiffResults diffResults = diffResultsCalculator.process(folderOneHashResults, folderTwoHashResults);
-        persistToReportDirectoryAsJSON.persist(diffResults, "diffResults.json");
+        // TODO create deserialise and read logic
+        DiffResults diffResults = diffResultsCalculator.process(null, null);
+        persistAsJSONToFile.persist(diffResults, "diffResults.json");
 
         return diffResults;
     }
 
-    private FolderHierarchy calculateFolderHierarchy(String absolutePathToWorkingDirectory,
-                                                     String reportFileNamePrefix) {
-        FolderHierarchy folderOneHashResults = calculateHashes(recursiveFileHashCalculator,
-                Paths.get(absolutePathToWorkingDirectory));
-        deserialiseAndPersist(folderOneHashResults,
-                reportFileNamePrefix);
-        return folderOneHashResults;
+    private void calculateAndStoreHashResults(String absolutePathToWorkingDirectory,
+                                              Location location) {
+        Path pathToWorkingDirectory = Paths.get(absolutePathToWorkingDirectory);
+        calculateHashes(pathToWorkingDirectory, location);
     }
 
-    private void deserialiseAndPersist(FolderHierarchy folderHierarchy,
-                                       String reportFileNamePrefix) {
-        String reportFileName = reportFileNamePrefix + "_folderHierarchy.json";
-        log.info("About to persist to: [" + reportFileName + "]");
-        persistToReportDirectoryAsJSON.persist(folderHierarchy, reportFileName);
-        log.info("Completed persisting to: [" + reportFileName + "]");
-    }
 
-    private FolderHierarchy calculateHashes(RecursiveFileHashCalculator hashReportGenerator, Path absolutePathToWorkingDirectory) {
-        log.info("About to process all hashes for [" + absolutePathToWorkingDirectory + "]");
-        FolderHierarchy folderHierarchy = hashReportGenerator.process(absolutePathToWorkingDirectory);
-        log.info("Processed and found: " + folderHierarchy.getFileHashResults().size());
-        return folderHierarchy;
+    private void calculateHashes(Path workingDirectory, Location location) {
+        log.info("About to calculate hashes for the working directory [{}]", workingDirectory.toFile().getAbsolutePath());
+        recursiveFileHashCalculator.process(workingDirectory,
+                fileHashResult -> fileHashResultRepository.put(location, fileHashResult));
     }
 }

@@ -2,7 +2,7 @@ package dev.alexhstone;
 
 import dev.alexhstone.calculator.RecursiveFileHashCalculator;
 import dev.alexhstone.exception.InvalidFileHashPathException;
-import dev.alexhstone.model.FolderHierarchy;
+import dev.alexhstone.model.FileHashResult;
 import dev.alexhstone.test.util.FileSystemUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
@@ -14,6 +14,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -56,20 +59,18 @@ class RecursiveFileHashReportGeneratorTest {
 
     @Test
     void shouldGenerateAnEmptyListForAnEmptyFolder() {
-        FolderHierarchy results = process(temporaryDirectory.toFile().getAbsolutePath());
+        Set<FileHashResult> fileHashResults = process(temporaryDirectory.toFile().getAbsolutePath());
 
-        assertThat(results.getFileHashResults(), Matchers.empty());
-        assertThat(results.getAbsolutePathToWorkingDirectory(), Matchers.not(Matchers.isEmptyOrNullString()));
+        assertThat(fileHashResults, Matchers.empty());
     }
 
     @Test
     void shouldGenerateASingleResultForSingleFileInAFolder() {
         createNonEmptyFile("emptyFile.txt");
 
-        FolderHierarchy results = process(temporaryDirectory.toFile().getAbsolutePath());
+        Set<FileHashResult> fileHashResults = process(temporaryDirectory.toFile().getAbsolutePath());
 
-        assertThat(results.getFileHashResults(), Matchers.hasSize(1));
-        assertThat(results.getAbsolutePathToWorkingDirectory(), Matchers.not(Matchers.isEmptyOrNullString()));
+        assertThat(fileHashResults, Matchers.hasSize(1));
     }
 
     @Test
@@ -77,14 +78,17 @@ class RecursiveFileHashReportGeneratorTest {
         createNonEmptyFile("emptyFile1.txt");
         createNonEmptyFile("emptyFile2.txt");
 
-        FolderHierarchy results = process(temporaryDirectory.toFile().getAbsolutePath());
+        Set<FileHashResult> fileHashResults = process(temporaryDirectory.toFile().getAbsolutePath());
 
-        assertThat(results.getFileHashResults(), Matchers.hasSize(2));
-        assertThat(results.getAbsolutePathToWorkingDirectory(), Matchers.not(Matchers.isEmptyOrNullString()));
+        assertThat(fileHashResults, Matchers.hasSize(2));
     }
 
-    private FolderHierarchy process(String path) {
-        return reportGenerator.process(Paths.get(path));
+    private Set<FileHashResult> process(String path) {
+        Set<FileHashResult> hashResults = Collections.synchronizedSet(new HashSet<>());
+
+        reportGenerator.process(Paths.get(path), hashResults::add);
+
+        return hashResults;
     }
 
     private void createNonEmptyFile(String file) {

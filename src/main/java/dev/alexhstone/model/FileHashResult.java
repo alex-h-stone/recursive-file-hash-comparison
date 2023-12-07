@@ -17,6 +17,8 @@ public class FileHashResult {
     @EqualsAndHashCode.Exclude
     String absolutePathToFile;
 
+    String absolutePathToWorkingDirectory;
+
     BigInteger fileSizeInBytes;
 
     @EqualsAndHashCode.Exclude

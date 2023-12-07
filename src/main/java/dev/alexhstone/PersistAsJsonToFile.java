@@ -8,23 +8,26 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class PersistToReportDirectoryAsJSON {
+public class PersistAsJsonToFile {
 
-    private final Path reportPath;
-    private final Gson prettyPrinting = new GsonBuilder().setPrettyPrinting().create();
+    private final Path workingDirectory;
+    private final Gson prettyPrinting;
 
-    public PersistToReportDirectoryAsJSON(Path reportPath) {
-        this.reportPath = reportPath;
+    public PersistAsJsonToFile(Path workingDirectory) {
+        this.workingDirectory = workingDirectory;
+        this.prettyPrinting = new GsonBuilder().setPrettyPrinting().create();
     }
 
-    public void persist(Object toBePersisted, String fileName) {
-        String jsonToBePersisted = prettyPrinting.toJson(toBePersisted);
-        Path resolvedPath = reportPath.resolve(fileName);
+    public void persist(Object objectToBePersisted, String fileName) {
+        String jsonToBePersisted = prettyPrinting.toJson(objectToBePersisted);
+
+        Path resolvedPath = workingDirectory.resolve(fileName);
         File resolvedPathToFile = resolvedPath.toFile();
         if (resolvedPathToFile.exists()) {
-            String message = "Unable to persist to [" + resolvedPathToFile.getAbsolutePath() + "] as the file already exists";
+            String message = "Unable to persist to [%s] as the file already exists".formatted(resolvedPathToFile.getAbsolutePath());
             throw new IllegalArgumentException(message);
         }
+
         try {
             Files.writeString(resolvedPath, jsonToBePersisted);
         } catch (IOException e) {

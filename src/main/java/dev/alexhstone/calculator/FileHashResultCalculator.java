@@ -26,6 +26,7 @@ public class FileHashResultCalculator {
                 .fileName(file.getName())
                 .relativePathToFile(relativePath.toString())
                 .absolutePathToFile(file.getAbsolutePath())
+                .absolutePathToWorkingDirectory(workingDirectory.toFile().getAbsolutePath())
                 .fileSizeInBytes(sizeOfFileInBytes)
                 .fileSize(byteCountToDisplaySize)
                 .hashDetails(hashDetails)
