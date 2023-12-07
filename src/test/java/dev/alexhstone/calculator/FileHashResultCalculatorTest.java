@@ -26,13 +26,12 @@ class FileHashResultCalculatorTest {
     @BeforeEach
     void setUp() {
         fileSystemUtils = new FileSystemUtils(temporaryDirectory);
-
         hashGenerator = new FileHashResultCalculator(new HashDetailsCalculator());
     }
 
     @Test
     void shouldCreateFullyPopulatedFileHashResultForFileThatExists() {
-        File existingFile = createFileWithContent("existingFile.txt", "Some test file contents");
+        File existingFile = fileSystemUtils.createFileWithContent("existingFile.txt", "Some test file contents");
 
         FileHashResult actualFileHashResult = hashGenerator.process(temporaryDirectory.toAbsolutePath(),
                 existingFile);
@@ -41,7 +40,7 @@ class FileHashResultCalculatorTest {
         Assertions.assertAll(
                 "Grouped Assertions of FileHashResult",
                 () -> Assertions.assertEquals("existingFile.txt", actualFileHashResult.getFileName()),
-                () -> Assertions.assertEquals(actualFileHashResult.getRelativePathToFile(), "\\"),
+                () -> Assertions.assertEquals("", actualFileHashResult.getRelativePathToFile()),
                 () -> MatcherAssert.assertThat(actualFileHashResult.getAbsolutePathToFile(), Matchers.containsString("existingFile.txt")),
                 () -> Assertions.assertEquals(BigInteger.valueOf(23), actualFileHashResult.getFileSizeInBytes()),
                 () -> Assertions.assertEquals("23 bytes", actualFileHashResult.getFileSize()),
@@ -50,7 +49,26 @@ class FileHashResultCalculatorTest {
         );
     }
 
-    private File createFileWithContent(String fileName, String content) {
-        return fileSystemUtils.createFileWithContent(fileName, content);
+    @Test
+    void shouldCreateFullyPopulatedFileHashResultForFileInSubdirectory() {
+        Path parentDirectory = fileSystemUtils.createDirectory("parentDirectory");
+        Path childDirectory = new FileSystemUtils(parentDirectory).createDirectory("childDirectory");
+
+        File existingFile = new FileSystemUtils(childDirectory).createFileWithContent("existingFile.txt", "Some test file contents");
+
+        FileHashResult actualFileHashResult = hashGenerator.process(temporaryDirectory.toAbsolutePath(),
+                existingFile);
+        HashDetails actualHashDetails = actualFileHashResult.getHashDetails();
+
+        Assertions.assertAll(
+                "Grouped Assertions of FileHashResult",
+                () -> Assertions.assertEquals("existingFile.txt", actualFileHashResult.getFileName()),
+                () -> Assertions.assertEquals("parentDirectory\\childDirectory", actualFileHashResult.getRelativePathToFile()),
+                () -> MatcherAssert.assertThat(actualFileHashResult.getAbsolutePathToFile(), Matchers.containsString("existingFile.txt")),
+                () -> Assertions.assertEquals(BigInteger.valueOf(23), actualFileHashResult.getFileSizeInBytes()),
+                () -> Assertions.assertEquals("23 bytes", actualFileHashResult.getFileSize()),
+                () -> Assertions.assertEquals("SHA256", actualHashDetails.getHashingAlgorithmName()),
+                () -> Assertions.assertEquals("224ff5a028e147b555f07f3e833950acb250baa121c3cc742fc390f5fd5ff9ec", actualHashDetails.getHashValue())
+        );
     }
 }

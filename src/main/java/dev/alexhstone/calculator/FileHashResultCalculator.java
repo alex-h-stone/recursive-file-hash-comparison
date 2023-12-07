@@ -14,22 +14,18 @@ public class FileHashResultCalculator {
 
     private final HashDetailsCalculator hashDetailsCalculator;
 
-    public FileHashResult process(Path absolutePathToWorkingDirectoryFile, File file) {
+    public FileHashResult process(Path workingDirectory, File file) {
         HashDetails hashDetails = hashDetailsCalculator.calculateHashDetails(file);
 
         BigInteger sizeOfFileInBytes = FileUtils.sizeOfAsBigInteger(file);
         String byteCountToDisplaySize = FileUtils.byteCountToDisplaySize(sizeOfFileInBytes);
 
-        String absolutePathToWorkingDirectory = absolutePathToWorkingDirectoryFile.toFile().getAbsolutePath();
-        String absolutePathToFile = file.getAbsolutePath();
-
-        String pathRelativeToWorkingDirectory = absolutePathToFile.replace(absolutePathToWorkingDirectory, "")
-                .replace(file.getName(), "");
+        Path relativePath = workingDirectory.relativize(file.toPath().getParent());
 
         return FileHashResult.builder()
                 .fileName(file.getName())
-                .relativePathToFile(pathRelativeToWorkingDirectory)
-                .absolutePathToFile(absolutePathToFile)
+                .relativePathToFile(relativePath.toString())
+                .absolutePathToFile(file.getAbsolutePath())
                 .fileSizeInBytes(sizeOfFileInBytes)
                 .fileSize(byteCountToDisplaySize)
                 .hashDetails(hashDetails)
