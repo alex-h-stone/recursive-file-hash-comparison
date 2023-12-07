@@ -1,6 +1,7 @@
-package dev.alexhstone.util;
+package dev.alexhstone.calculator;
 
 import dev.alexhstone.exception.InvalidFileException;
+import dev.alexhstone.util.HashAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -10,23 +11,22 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 
 @Slf4j
-public class HashCalculator {
+class HashCalculator {
 
     private static final HashAlgorithm SHA256_HASH = HashAlgorithm.SHA256;
 
-    public String calculateHashFor(File file) {
+    String calculateHashFor(File file) {
         if (file.isDirectory()) {
             String message = "Expected [%s] to be a file, but was actually a directory"
                     .formatted(file.getAbsolutePath());
             throw new InvalidFileException(message);
         }
 
-        MessageDigest sha256Algorithm = SHA256_HASH.getAlgorithm();
-        byte[] hashAsBytes = calculateHashOf(file, sha256Algorithm);
+        byte[] hashAsBytes = calculateHashOf(file, SHA256_HASH);
         return convertToString(hashAsBytes);
     }
 
-    private static String convertToString(byte[] bytes) {
+    private String convertToString(byte[] bytes) {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (byte b : bytes) {
@@ -35,21 +35,23 @@ public class HashCalculator {
         return stringBuilder.toString();
     }
 
-    private byte[] calculateHashOf(File file, MessageDigest sha256Algorithm) {
-        InputStream fis = null;
-        log.info("About to calculate hash for: " + file.getAbsolutePath());
+    private byte[] calculateHashOf(File file, HashAlgorithm hashAlgorithm) {
+        log.info("About to calculate {} hash for: {}",
+                hashAlgorithm.getAlgorithmName(),
+                file.getAbsolutePath());
         try {
-            fis = new FileInputStream(file);
+            InputStream fis = new FileInputStream(file);
             byte[] byteArray = new byte[1024];
-            int bytesCount = 0;
+            int bytesCount;
 
+            MessageDigest messageDigest = hashAlgorithm.getAlgorithm();
             while ((bytesCount = fis.read(byteArray)) != -1) {
-                sha256Algorithm.update(byteArray, 0, bytesCount);
+                messageDigest.update(byteArray, 0, bytesCount);
             }
 
             fis.close();
 
-            byte[] digested = sha256Algorithm.digest();
+            byte[] digested = messageDigest.digest();
             log.info("Completed calculating hash for: " + file.getAbsolutePath());
             return digested;
         } catch (IOException ex) {

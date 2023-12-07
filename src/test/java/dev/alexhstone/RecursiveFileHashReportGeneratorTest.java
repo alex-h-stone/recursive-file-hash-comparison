@@ -1,5 +1,6 @@
 package dev.alexhstone;
 
+import dev.alexhstone.calculator.RecursiveFileHashCalculator;
 import dev.alexhstone.exception.InvalidFileHashPathException;
 import dev.alexhstone.model.FolderHierarchy;
 import dev.alexhstone.test.util.FileSystemUtils;

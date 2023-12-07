@@ -1,4 +1,4 @@
-package dev.alexhstone;
+package dev.alexhstone.calculator;
 
 import dev.alexhstone.model.DiffResults;
 import dev.alexhstone.model.FileHashResult;
@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class DiffResultsCalculator {
     public String compareResults(List<FileHashResult> reportOne, List<FileHashResult> reportTwo) {

@@ -1,5 +1,7 @@
 package dev.alexhstone;
 
+import dev.alexhstone.calculator.DiffResultsCalculator;
+import dev.alexhstone.calculator.RecursiveFileHashCalculator;
 import dev.alexhstone.model.DiffResults;
 import dev.alexhstone.model.FolderHierarchy;
 import lombok.extern.slf4j.Slf4j;

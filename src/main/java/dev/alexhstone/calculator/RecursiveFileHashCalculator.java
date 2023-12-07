@@ -1,9 +1,8 @@
-package dev.alexhstone;
+package dev.alexhstone.calculator;
 
-import dev.alexhstone.model.FolderHierarchy;
 import dev.alexhstone.exception.InvalidFileHashPathException;
 import dev.alexhstone.model.FileHashResult;
-import dev.alexhstone.util.HashCalculator;
+import dev.alexhstone.model.FolderHierarchy;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +18,7 @@ public class RecursiveFileHashCalculator {
     private final FileHashResultCalculator fileHashResultCalculator;
 
     public RecursiveFileHashCalculator() {
-        HashCalculator hashCalculator = new HashCalculator();
+        HashDetailsCalculator hashCalculator = new HashDetailsCalculator();
         fileHashResultCalculator = new FileHashResultCalculator(hashCalculator);
     }
 

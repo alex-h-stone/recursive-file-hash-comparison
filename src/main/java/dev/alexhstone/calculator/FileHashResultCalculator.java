@@ -1,10 +1,9 @@
-package dev.alexhstone;
+package dev.alexhstone.calculator;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.FileUtils;
 import dev.alexhstone.model.FileHashResult;
 import dev.alexhstone.model.HashDetails;
-import dev.alexhstone.util.HashCalculator;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -13,10 +12,10 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public class FileHashResultCalculator {
 
-    private final HashCalculator hashCalculator;
+    private final HashDetailsCalculator hashDetailsCalculator;
 
     public FileHashResult process(Path absolutePathToWorkingDirectoryFile, File file) {
-        HashDetails hashDetails = calculateHashDetails(file);
+        HashDetails hashDetails = hashDetailsCalculator.calculateHashDetails(file);
 
         BigInteger sizeOfFileInBytes = FileUtils.sizeOfAsBigInteger(file);
         String byteCountToDisplaySize = FileUtils.byteCountToDisplaySize(sizeOfFileInBytes);
@@ -34,14 +33,6 @@ public class FileHashResultCalculator {
                 .fileSizeInBytes(sizeOfFileInBytes)
                 .fileSize(byteCountToDisplaySize)
                 .hashDetails(hashDetails)
-                .build();
-    }
-
-
-    private HashDetails calculateHashDetails(File file) {
-        return HashDetails.builder()
-                .hashingAlgorithmName(hashCalculator.getAlgorithmName())
-                .hashValue(hashCalculator.calculateHashFor(file))
                 .build();
     }
 }

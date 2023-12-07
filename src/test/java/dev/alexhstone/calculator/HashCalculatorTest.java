@@ -1,4 +1,4 @@
-package dev.alexhstone.util;
+package dev.alexhstone.calculator;
 
 import dev.alexhstone.exception.InvalidFileException;
 import dev.alexhstone.test.util.FileSystemUtils;
@@ -8,7 +8,6 @@ import org.hamcrest.text.IsEmptyString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
@@ -88,12 +87,7 @@ class HashCalculatorTest {
         File file = temporaryDirectory.toFile();
         assertTrue(file.isDirectory(), "Failed precondition");
 
-        InvalidFileException expectedException = assertThrows(InvalidFileException.class, new Executable() {
-            @Override
-            public void execute() throws InvalidFileException {
-                hashCalculator.calculateHashFor(file);
-            }
-        });
+        InvalidFileException expectedException = assertThrows(InvalidFileException.class, () -> hashCalculator.calculateHashFor(file));
         String actualExceptionMessage = expectedException.getMessage();
 
         assertThat(actualExceptionMessage, CoreMatchers.containsString("Expected ["));

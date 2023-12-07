@@ -1,9 +1,9 @@
-package dev.alexhstone;
+package dev.alexhstone.calculator;
 
 import dev.alexhstone.model.FileHashResult;
 import dev.alexhstone.model.HashDetails;
 import dev.alexhstone.test.util.FileSystemUtils;
-import dev.alexhstone.util.HashCalculator;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,8 +14,6 @@ import java.io.File;
 import java.math.BigInteger;
 import java.nio.file.Path;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FileHashResultCalculatorTest {
 
@@ -29,8 +27,7 @@ class FileHashResultCalculatorTest {
     void setUp() {
         fileSystemUtils = new FileSystemUtils(temporaryDirectory);
 
-        HashCalculator hashCalculator = new HashCalculator();
-        hashGenerator = new FileHashResultCalculator(hashCalculator);
+        hashGenerator = new FileHashResultCalculator(new HashDetailsCalculator());
     }
 
     @Test
@@ -43,13 +40,13 @@ class FileHashResultCalculatorTest {
 
         Assertions.assertAll(
                 "Grouped Assertions of FileHashResult",
-                () -> assertEquals("existingFile.txt", actualFileHashResult.getFileName()),
-                () -> assertEquals(actualFileHashResult.getRelativePathToFile(), "\\"),
-                () -> assertThat(actualFileHashResult.getAbsolutePathToFile(), Matchers.containsString("existingFile.txt")),
-                () -> assertEquals(BigInteger.valueOf(23), actualFileHashResult.getFileSizeInBytes()),
-                () -> assertEquals("23 bytes", actualFileHashResult.getFileSize()),
-                () -> assertEquals("SHA256", actualHashDetails.getHashingAlgorithmName()),
-                () -> assertEquals("224ff5a028e147b555f07f3e833950acb250baa121c3cc742fc390f5fd5ff9ec", actualHashDetails.getHashValue())
+                () -> Assertions.assertEquals("existingFile.txt", actualFileHashResult.getFileName()),
+                () -> Assertions.assertEquals(actualFileHashResult.getRelativePathToFile(), "\\"),
+                () -> MatcherAssert.assertThat(actualFileHashResult.getAbsolutePathToFile(), Matchers.containsString("existingFile.txt")),
+                () -> Assertions.assertEquals(BigInteger.valueOf(23), actualFileHashResult.getFileSizeInBytes()),
+                () -> Assertions.assertEquals("23 bytes", actualFileHashResult.getFileSize()),
+                () -> Assertions.assertEquals("SHA256", actualHashDetails.getHashingAlgorithmName()),
+                () -> Assertions.assertEquals("224ff5a028e147b555f07f3e833950acb250baa121c3cc742fc390f5fd5ff9ec", actualHashDetails.getHashValue())
         );
     }
 
