@@ -1,6 +1,6 @@
 package dev.alexhstone.integration;
 
-import dev.alexhstone.Application;
+import dev.alexhstone.CompareDirectories;
 import dev.alexhstone.model.DiffResults;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("long-running")
 @Tag("integration")
-public class ApplicationIntegrationTest {
+public class CompareDirectoriesIntegrationTest {
 
     @TempDir
     private Path reportDirectory;
@@ -27,12 +27,12 @@ public class ApplicationIntegrationTest {
     void scenarioOne_ShouldBeNoDifferencesAsAllFilesAreIdentical() {
         String scenarioOne = "C:\\Users\\Alex\\github_projects\\recursive-file-hash-comparison\\src\\test\\resources\\integration\\scenarioOne\\";
 
-        Application application = new Application(
+        CompareDirectories compareDirectories = new CompareDirectories(
                 scenarioOne + "left",
                 scenarioOne + "right",
                 reportDirectory.toFile().getAbsolutePath());
 
-        DiffResults diffResults = application.execute();
+        DiffResults diffResults = compareDirectories.execute();
 
         assertThat(diffResults.getLeftFilesNotPresentInRight(),
                 Matchers.hasSize(0));
@@ -53,12 +53,12 @@ public class ApplicationIntegrationTest {
     void scenarioTwo_ShouldBeADifferencesAspopulatedFile1_copyAreNotIdenticalContents() {
         String scenarioOne = "C:\\Users\\Alex\\github_projects\\recursive-file-hash-comparison\\src\\test\\resources\\integration\\scenarioTwo\\";
 
-        Application application = new Application(
+        CompareDirectories compareDirectories = new CompareDirectories(
                 scenarioOne + "left",
                 scenarioOne + "right",
                 reportDirectory.toFile().getAbsolutePath());
 
-        DiffResults diffResults = application.execute();
+        DiffResults diffResults = compareDirectories.execute();
 
         assertThat(diffResults.getLeftFilesNotPresentInRight(),
                 Matchers.hasSize(1));

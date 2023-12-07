@@ -1,8 +1,8 @@
 package dev.alexhstone;
 
-import dev.alexhstone.model.FolderHierarchy;
-import dev.alexhstone.test.util.FileCreator;
 import dev.alexhstone.exception.InvalidFileHashPathException;
+import dev.alexhstone.model.FolderHierarchy;
+import dev.alexhstone.test.util.FileSystemUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,11 +25,11 @@ class RecursiveFileHashReportGeneratorTest {
 
     private RecursiveFileHashCalculator reportGenerator;
 
-    private FileCreator fileCreator;
+    private FileSystemUtils fileSystemUtils;
 
     @BeforeEach
     void setUp() {
-        fileCreator = new FileCreator(temporaryDirectory);
+        fileSystemUtils = new FileSystemUtils(temporaryDirectory);
         reportGenerator = new RecursiveFileHashCalculator();
     }
 
@@ -87,6 +87,6 @@ class RecursiveFileHashReportGeneratorTest {
     }
 
     private void createNonEmptyFile(String file) {
-        fileCreator.createFileWithContent(file, "Not empty");
+        fileSystemUtils.createFileWithContent(file, "Not empty");
     }
 }

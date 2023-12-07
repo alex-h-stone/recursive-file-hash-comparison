@@ -2,7 +2,7 @@ package dev.alexhstone;
 
 import dev.alexhstone.model.FileHashResult;
 import dev.alexhstone.model.HashDetails;
-import dev.alexhstone.test.util.FileCreator;
+import dev.alexhstone.test.util.FileSystemUtils;
 import dev.alexhstone.util.HashCalculator;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
@@ -22,12 +22,12 @@ class FileHashResultCalculatorTest {
     @TempDir
     private Path temporaryDirectory;
 
-    private FileCreator fileCreator;
+    private FileSystemUtils fileSystemUtils;
     private FileHashResultCalculator hashGenerator;
 
     @BeforeEach
     void setUp() {
-        fileCreator = new FileCreator(temporaryDirectory);
+        fileSystemUtils = new FileSystemUtils(temporaryDirectory);
 
         HashCalculator hashCalculator = new HashCalculator();
         hashGenerator = new FileHashResultCalculator(hashCalculator);
@@ -44,6 +44,7 @@ class FileHashResultCalculatorTest {
         Assertions.assertAll(
                 "Grouped Assertions of FileHashResult",
                 () -> assertEquals("existingFile.txt", actualFileHashResult.getFileName()),
+                () -> assertEquals(actualFileHashResult.getRelativePathToFile(), "\\"),
                 () -> assertThat(actualFileHashResult.getAbsolutePathToFile(), Matchers.containsString("existingFile.txt")),
                 () -> assertEquals(BigInteger.valueOf(23), actualFileHashResult.getFileSizeInBytes()),
                 () -> assertEquals("23 bytes", actualFileHashResult.getFileSize()),
@@ -53,6 +54,6 @@ class FileHashResultCalculatorTest {
     }
 
     private File createFileWithContent(String fileName, String content) {
-        return fileCreator.createFileWithContent(fileName, content);
+        return fileSystemUtils.createFileWithContent(fileName, content);
     }
 }

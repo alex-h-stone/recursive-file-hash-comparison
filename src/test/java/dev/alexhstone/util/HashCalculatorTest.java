@@ -1,7 +1,7 @@
 package dev.alexhstone.util;
 
-import dev.alexhstone.test.util.FileCreator;
 import dev.alexhstone.exception.InvalidFileException;
+import dev.alexhstone.test.util.FileSystemUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.hamcrest.text.IsEmptyString;
@@ -21,7 +21,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HashCalculatorTest {
 
@@ -31,11 +33,11 @@ class HashCalculatorTest {
 
     private HashCalculator hashCalculator;
 
-    private FileCreator fileCreator;
+    private FileSystemUtils fileSystemUtils;
 
     @BeforeEach
     void setUp() {
-        fileCreator = new FileCreator(temporaryDirectory);
+        fileSystemUtils = new FileSystemUtils(temporaryDirectory);
         hashCalculator = new HashCalculator();
     }
 
@@ -137,6 +139,6 @@ class HashCalculatorTest {
     }
 
     private File createFileWithContent(String fileName, String content) {
-        return fileCreator.createFileWithContent(fileName, content);
+        return fileSystemUtils.createFileWithContent(fileName, content);
     }
 }

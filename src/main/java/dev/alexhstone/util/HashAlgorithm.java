@@ -1,27 +1,30 @@
 package dev.alexhstone.util;
 
 
+import lombok.Getter;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
+@Getter
 public enum HashAlgorithm {
     SHA256("SHA-256");
 
-    private final String digestAlgorithmName;
+    private final String algorithmName;
+    private final MessageDigest algorithm;
 
-    HashAlgorithm(String digestAlgorithmName) {
-        this.digestAlgorithmName = digestAlgorithmName;
+    HashAlgorithm(String algorithmName) {
+        this.algorithmName = algorithmName;
+        this.algorithm = createMessageDigestAlgorithm(algorithmName);
     }
 
-    public MessageDigest getMessageDigestAlgorithm() {
+    private static MessageDigest createMessageDigestAlgorithm(String algorithmName) {
         try {
-            // TODO consider initialise at startup, 1 instance?
-            // verify thread safety?
-            return MessageDigest.getInstance(digestAlgorithmName);
+            return MessageDigest.getInstance(algorithmName);
         } catch (NoSuchAlgorithmException e) {
             String message = "Unable to create instance of the algorithm [%s] because of: %s"
-                    .formatted(digestAlgorithmName, e.getMessage());
+                    .formatted(algorithmName, e.getMessage());
             throw new RuntimeException(message, e);
         }
     }

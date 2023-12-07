@@ -8,30 +8,27 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Slf4j
-public class Application {
+public class CompareDirectories {
 
-    private final String leftWorkingDirectory;
-    private final String rightWorkingDirectory;
-    private final String absolutePathToReportDirectory;
-    private final RecursiveFileHashCalculator recursiveFileHashCalculator;
-    private PersistToReportDirectoryAsJSON persistToReportDirectoryAsJSON;
+    private final String leftAbsolutePath;
+    private final String rightAbsolutePath;
+    private final RecursiveFileHashCalculator recursiveFileHashCalculator = new RecursiveFileHashCalculator();
+    private final PersistToReportDirectoryAsJSON persistToReportDirectoryAsJSON;
 
-    public Application(String leftWorkingDirectory,
-                       String rightWorkingDirectory,
-                       String absolutePathToReportDirectory) {
-        this.leftWorkingDirectory = leftWorkingDirectory;
-        this.rightWorkingDirectory = rightWorkingDirectory;
-        this.absolutePathToReportDirectory = absolutePathToReportDirectory;
-        this.recursiveFileHashCalculator = new RecursiveFileHashCalculator();
-        this.persistToReportDirectoryAsJSON = new PersistToReportDirectoryAsJSON(absolutePathToReportDirectory);
-
+    public CompareDirectories(String leftAbsolutePath,
+                              String rightAbsolutePath,
+                              String reportDirectoryAbsolutePath) {
+        // TODO add validate for methods parameters
+        this.leftAbsolutePath = leftAbsolutePath;
+        this.rightAbsolutePath = rightAbsolutePath;
+        this.persistToReportDirectoryAsJSON = new PersistToReportDirectoryAsJSON(Paths.get(reportDirectoryAbsolutePath));
     }
 
     public DiffResults execute() {
 
-        FolderHierarchy folderOneHashResults = calculateFolderHierarchy(leftWorkingDirectory,
+        FolderHierarchy folderOneHashResults = calculateFolderHierarchy(leftAbsolutePath,
                 "left");
-        FolderHierarchy folderTwoHashResults = calculateFolderHierarchy(rightWorkingDirectory,
+        FolderHierarchy folderTwoHashResults = calculateFolderHierarchy(rightAbsolutePath,
                 "right");
 
         DiffResultsCalculator diffResultsCalculator = new DiffResultsCalculator();

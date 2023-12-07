@@ -12,7 +12,7 @@ class HashAlgorithmTest {
     @Test
     void allHashAlgorithmsShouldBeNonNull() {
         Arrays.stream(HashAlgorithm.values()).forEach(hashAlgorithm -> {
-            MessageDigest algorithm = hashAlgorithm.getMessageDigestAlgorithm();
+            MessageDigest algorithm = hashAlgorithm.getAlgorithm();
             String message = "Expected  non-null hashAlgorithm for: [%s]"
                     .formatted(hashAlgorithm);
             assertNotNull(algorithm, message);

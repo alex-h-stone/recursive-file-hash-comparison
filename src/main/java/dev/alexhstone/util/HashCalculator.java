@@ -1,7 +1,7 @@
 package dev.alexhstone.util;
 
-import lombok.extern.slf4j.Slf4j;
 import dev.alexhstone.exception.InvalidFileException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,7 +12,7 @@ import java.security.MessageDigest;
 @Slf4j
 public class HashCalculator {
 
-    private static final HashAlgorithm HASH_ALGORITHM = HashAlgorithm.SHA256;
+    private static final HashAlgorithm SHA256_HASH = HashAlgorithm.SHA256;
 
     public String calculateHashFor(File file) {
         if (file.isDirectory()) {
@@ -21,7 +21,7 @@ public class HashCalculator {
             throw new InvalidFileException(message);
         }
 
-        MessageDigest sha256Algorithm = HASH_ALGORITHM.getMessageDigestAlgorithm();
+        MessageDigest sha256Algorithm = SHA256_HASH.getAlgorithm();
         byte[] hashAsBytes = calculateHashOf(file, sha256Algorithm);
         return convertToString(hashAsBytes);
     }
@@ -58,6 +58,6 @@ public class HashCalculator {
     }
 
     public String getAlgorithmName() {
-        return HASH_ALGORITHM.name();
+        return SHA256_HASH.name();
     }
 }
