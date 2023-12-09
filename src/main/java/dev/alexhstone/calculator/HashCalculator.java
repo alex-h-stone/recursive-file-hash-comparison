@@ -11,18 +11,26 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 
 @Slf4j
-class HashCalculator {
+public class HashCalculator {
 
-    private static final HashAlgorithm SHA256_HASH = HashAlgorithm.SHA256;
+    private static final HashAlgorithm HASH_ALGORITHM = HashAlgorithm.SHA256;
 
-    String calculateHashFor(File file) {
+    public String calculateHashFor(String string) {
+        MessageDigest hashAlgorithm = HASH_ALGORITHM.getAlgorithm();
+
+        byte[] hashAsBytes = hashAlgorithm.digest(string.getBytes());
+
+        return convertToString(hashAsBytes);
+    }
+
+    public String calculateHashFor(File file) {
         if (file.isDirectory()) {
             String message = "Expected [%s] to be a file, but was actually a directory"
                     .formatted(file.getAbsolutePath());
             throw new InvalidFileException(message);
         }
 
-        byte[] hashAsBytes = calculateHashOf(file, SHA256_HASH);
+        byte[] hashAsBytes = calculateHashOf(file);
         return convertToString(hashAsBytes);
     }
 
@@ -35,16 +43,16 @@ class HashCalculator {
         return stringBuilder.toString();
     }
 
-    private byte[] calculateHashOf(File file, HashAlgorithm hashAlgorithm) {
-        log.info("About to calculate {} hash for: {}",
-                hashAlgorithm.getAlgorithmName(),
+    private byte[] calculateHashOf(File file) {
+        log.debug("About to calculate the {} hash for: [{}]",
+                HASH_ALGORITHM,
                 file.getAbsolutePath());
         try {
             InputStream fis = new FileInputStream(file);
             byte[] byteArray = new byte[1024];
             int bytesCount;
 
-            MessageDigest messageDigest = hashAlgorithm.getAlgorithm();
+            MessageDigest messageDigest = HASH_ALGORITHM.getAlgorithm();
             while ((bytesCount = fis.read(byteArray)) != -1) {
                 messageDigest.update(byteArray, 0, bytesCount);
             }
@@ -52,7 +60,8 @@ class HashCalculator {
             fis.close();
 
             byte[] digested = messageDigest.digest();
-            log.info("Completed calculating hash for: " + file.getAbsolutePath());
+            log.debug("Completed calculating {} hash for: [{}]",
+                    HASH_ALGORITHM, file.getAbsolutePath());
             return digested;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -60,6 +69,6 @@ class HashCalculator {
     }
 
     public String getAlgorithmName() {
-        return SHA256_HASH.name();
+        return HASH_ALGORITHM.name();
     }
 }

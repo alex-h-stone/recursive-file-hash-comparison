@@ -1,8 +1,9 @@
 package dev.alexhstone.calculator;
 
-import dev.alexhstone.model.DiffResults;
 import dev.alexhstone.model.FileHashResult;
 import dev.alexhstone.model.FolderHierarchy;
+import dev.alexhstone.model.HashDiffResults;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,35 +11,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+@Slf4j
 public class DiffResultsCalculator {
-    public String compareResults(List<FileHashResult> reportOne, List<FileHashResult> reportTwo) {
-        return "TODO";
-    }
 
-    public DiffResults process(FolderHierarchy leftHashResults,
-                               FolderHierarchy rightHashResults) {
+    public HashDiffResults compareResults(Set<String> leftHashes, Set<String> rightHashes) {
 
-        Set<FileHashResult> left = getFileHashResults(leftHashResults);
-        Set<FileHashResult> right = new HashSet<>(rightHashResults.getFileHashResults());
-
-        // TODO add validation logic , size as list equals size as set
-
-        List<FileHashResult> leftFilesNotPresentInRight = left
+        log.debug("About to calculate leftHashesNotPresentInRight from {} leftHashes", leftHashes.size());
+        Set<String> leftHashesNotPresentInRight = leftHashes
                 .parallelStream()
-                .filter(leftHashResult -> !(right.contains(leftHashResult)))
-                .toList();
+                .filter(leftHashResult -> !(rightHashes.contains(leftHashResult)))
+                .collect(Collectors.toSet());
 
-        List<FileHashResult> rightFilesNotPresentInLeft = right
+        log.debug("About to calculate rightHashesNotPresentInLeft from {} rightHashes", rightHashes.size());
+        Set<String> rightHashesNotPresentInLeft = rightHashes
                 .parallelStream()
-                .filter(rightHashResult -> !(left.contains(rightHashResult)))
-                .toList();
+                .filter(rightHashResult -> !(leftHashes.contains(rightHashResult)))
+                .collect(Collectors.toSet());
 
         // TODO add fuzzy matching of misses?
 
-        return DiffResults.builder()
-                .leftFilesNotPresentInRight(leftFilesNotPresentInRight)
-                .rightFilesNotPresentInLeft(rightFilesNotPresentInLeft)
+        return HashDiffResults.builder()
+                .leftHashesNotPresentInRight(leftHashesNotPresentInRight)
+                .rightHashesNotPresentInLeft(rightHashesNotPresentInLeft)
                 .build();
     }
 

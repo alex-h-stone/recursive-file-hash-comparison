@@ -4,6 +4,7 @@ import dev.alexhstone.calculator.DiffResultsCalculator;
 import dev.alexhstone.calculator.Location;
 import dev.alexhstone.calculator.RecursiveFileHashCalculator;
 import dev.alexhstone.model.DiffResults;
+import dev.alexhstone.model.HashDiffResults;
 import dev.alexhstone.storage.FileHashResultRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,7 +28,7 @@ public class CompareDirectories {
         this.leftAbsolutePath = leftAbsolutePath;
         this.rightAbsolutePath = rightAbsolutePath;
         this.persistAsJSONToFile = new PersistAsJsonToFile(Paths.get(reportDirectoryAbsolutePath));
-        this.fileHashResultRepository = new FileHashResultRepository();
+        this.fileHashResultRepository = new FileHashResultRepository(Paths.get(reportDirectoryAbsolutePath));
         this.recursiveFileHashCalculator = new RecursiveFileHashCalculator();
     }
 
@@ -45,24 +46,26 @@ public class CompareDirectories {
         combinedFuture.join();
 
 
-        DiffResultsCalculator diffResultsCalculator = new DiffResultsCalculator();
-        // TODO create deserialise and read logic
-        DiffResults diffResults = diffResultsCalculator.process(null, null);
-        persistAsJSONToFile.persist(diffResults, "diffResults.json");
 
-        return diffResults;
+        DiffResultsCalculator diffResultsCalculator = new DiffResultsCalculator();
+        HashDiffResults hashDiffResults = diffResultsCalculator.compareResults(fileHashResultRepository.getLeftKeys(),
+                fileHashResultRepository.getRightKeys());
+        // TODO create deserialise and read logic
+        persistAsJSONToFile.persist(hashDiffResults, "diffResults.json");
+
+        return null;
     }
 
     private void calculateAndStoreHashResults(String absolutePathToWorkingDirectory,
                                               Location location) {
-        Path pathToWorkingDirectory = Paths.get(absolutePathToWorkingDirectory);
-        calculateHashes(pathToWorkingDirectory, location);
-    }
+        Path workingDirectory = Paths.get(absolutePathToWorkingDirectory);
+        String absolutePath = workingDirectory.toFile().getAbsolutePath();
 
-
-    private void calculateHashes(Path workingDirectory, Location location) {
-        log.info("About to calculate hashes for the working directory [{}]", workingDirectory.toFile().getAbsolutePath());
+        log.info("About to calculate hashes for the working directory [{}]", absolutePath);
         recursiveFileHashCalculator.process(workingDirectory,
                 fileHashResult -> fileHashResultRepository.put(location, fileHashResult));
+        log.info("Completed calculating the hashes for the working directory [{}]", absolutePath);
     }
+
+
 }

@@ -2,6 +2,7 @@ package dev.alexhstone.calculator;
 
 import dev.alexhstone.exception.InvalidFileException;
 import dev.alexhstone.test.util.FileSystemUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.hamcrest.text.IsEmptyString;
@@ -25,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HashCalculatorTest {
-
 
     @TempDir
     private Path temporaryDirectory;
@@ -126,10 +126,24 @@ class HashCalculatorTest {
     }
 
     @Test
-    void shouldReturnNonEmptyStringWhenCalling() {
+    void shouldReturnNonEmptyStringWhenCallingGetAlgorithmName() {
         String actualAlgorithmName = hashCalculator.getAlgorithmName();
 
         assertThat(actualAlgorithmName, Matchers.not(Matchers.isEmptyOrNullString()));
+    }
+
+    @Test
+    void shouldHashEmptyString() {
+        String actualHash = hashCalculator.calculateHashFor(StringUtils.EMPTY);
+
+        assertThat(actualHash, CoreMatchers.not(IsEmptyString.isEmptyString()));
+    }
+
+    @Test
+    void shouldHashNonEmptyString() {
+        String actualHash = hashCalculator.calculateHashFor("sample contents for hashing");
+
+        assertThat(actualHash, CoreMatchers.not(IsEmptyString.isEmptyString()));
     }
 
     private File createFileWithContent(String fileName, String content) {
