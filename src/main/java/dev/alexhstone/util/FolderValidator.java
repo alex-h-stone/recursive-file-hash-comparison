@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 
 public class FolderValidator {
 
-    public void validateExistsAndWritable(Path path) {
+    public Path validateExistsAndWritable(Path path) {
         File file = path.toFile();
         if (!file.exists()) {
             String message = "The path does not exist [%s]".formatted(file.getAbsolutePath());
@@ -19,10 +19,12 @@ public class FolderValidator {
             String message = "The path is not a directory [%s]".formatted(file.getAbsolutePath());
             throw new InvalidPathException(message);
         }
+
+        return path;
     }
 
-    public void validateExistsAndWritable(String absolutePath) {
+    public Path validateExistsAndWritable(String absolutePath) {
         Path path = Paths.get(absolutePath);
-        validateExistsAndWritable(path);
+        return validateExistsAndWritable(path);
     }
 }

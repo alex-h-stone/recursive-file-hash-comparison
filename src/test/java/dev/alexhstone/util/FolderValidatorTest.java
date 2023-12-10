@@ -12,7 +12,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -35,7 +37,9 @@ class FolderValidatorTest {
         assertTrue(folderAsFile.exists(), "Failed precondition");
         assertTrue(folderAsFile.canWrite(), "Failed precondition");
 
-        folderValidator.validateExistsAndWritable(temporaryDirectory);
+        Path validPath = folderValidator.validateExistsAndWritable(temporaryDirectory);
+        assertNotNull(validPath);
+        assertEquals(temporaryDirectory, validPath);
     }
 
     @Test
@@ -73,9 +77,11 @@ class FolderValidatorTest {
         assertTrue(temporaryDirectoryAsFile.exists(), "Failed precondition");
         assertTrue(temporaryDirectoryAsFile.canWrite(), "Failed precondition");
 
-        String absolutePathToDirectory = temporaryDirectoryAsFile.getAbsolutePath();
+        String absolutePathToDirectoryAsString = temporaryDirectoryAsFile.getAbsolutePath();
 
-        folderValidator.validateExistsAndWritable(absolutePathToDirectory);
+        Path validPath = folderValidator.validateExistsAndWritable(absolutePathToDirectoryAsString);
+        assertNotNull(validPath);
+        assertEquals(temporaryDirectory, validPath);
     }
 
     @Test
