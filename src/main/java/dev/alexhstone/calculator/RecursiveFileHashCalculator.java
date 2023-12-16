@@ -1,60 +1,56 @@
 package dev.alexhstone.calculator;
 
-import dev.alexhstone.exception.InvalidFileHashPathException;
 import dev.alexhstone.model.FileHashResult;
+import dev.alexhstone.util.DirectoryValidator;
+import dev.alexhstone.util.PathWalker;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
+import java.util.function.Predicate;
 
 @Slf4j
 public class RecursiveFileHashCalculator {
 
     private final FileHashResultCalculator fileHashResultCalculator;
+    private final DirectoryValidator directoryValidator;
 
     public RecursiveFileHashCalculator() {
         HashDetailsCalculator hashCalculator = new HashDetailsCalculator();
         fileHashResultCalculator = new FileHashResultCalculator(hashCalculator);
+        directoryValidator = new DirectoryValidator();
     }
 
-    public void process(Path workingDirectoryPath, Consumer<FileHashResult> consumer) {
-        String workingDirectoryPathString = workingDirectoryPath.toFile().getAbsolutePath();
-        if (!Files.exists(workingDirectoryPath)) {
-            String message = "The supplied path [" + workingDirectoryPath + "] does not exist, expected something of the form " +
-                    "C:\\directory. The supplied path was resolved to the absolute path [" + workingDirectoryPathString + "]";
-            throw new InvalidFileHashPathException(message);
-        }
-        Stream<Path> pathToWalk = walk(workingDirectoryPath);
-        List<File> files = pathToWalk
+    public void process(Path workingDirectory, Consumer<FileHashResult> consumer) {
+        Path validPath = directoryValidator.validateExists(workingDirectory);
+
+        PathWalker pathWalker = new PathWalker(workingDirectory);
+
+        List<File> files = pathWalker.walk()
                 .parallel()
                 .map(Path::toFile)
                 .filter(File::isFile)
                 .toList();
+        String workingDirectoryPathString = workingDirectory.toFile().getAbsolutePath();
         log.info("About to calculate hashes for {} files under the working directory [{}]",
                 files.size(), workingDirectoryPathString);
 
+        // TODO chunk this
         files.parallelStream()
+                .filter(new Predicate<File>() {
+                    @Override
+                    public boolean test(File file) {
+                        return false;
+                    }
+                })
                 .forEach(file -> {
                     FileHashResult hashResult =
-                            fileHashResultCalculator.process(workingDirectoryPath, file);
+                            fileHashResultCalculator.process(validPath, file);
                     consumer.accept(hashResult);
                 });
         log.info("Completed calculating hashes for {} files under the working directory [{}]",
                 files.size(), workingDirectoryPathString);
-    }
-
-    private Stream<Path> walk(Path path) {
-        try {
-            return Files.walk(path);
-        } catch (IOException e) {
-            String message = "Unable to walk the folder hierarchy at [%s] because of: %s"
-                    .formatted(path.toAbsolutePath(), e.getMessage());
-            throw new RuntimeException(message);
-        }
     }
 }
