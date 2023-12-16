@@ -13,7 +13,13 @@ public class FileValidator {
             throw new InvalidPathException(message);
         }
 
-        if (file.isDirectory()) {
+        return file;
+    }
+
+    public File validateIsFile(File file){
+        File fileExists = validateExists(file);
+
+        if (fileExists.isDirectory()) {
             String message = "The file is actually a directory [%s]".formatted(file.getAbsolutePath());
             throw new InvalidPathException(message);
         }

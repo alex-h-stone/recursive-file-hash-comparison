@@ -17,11 +17,15 @@ For 2 files to match the following conditions must be met:
 Components
 
 Work item producer
-Given an or absolute path to a working directory, traverse the entire directory structure and create a new Work Item for each file and directory. Each work item is then sent to a disk backed queue to be processed.
+Given an absolute path to a working directory, traverse the entire directory structure and create a new Work Item for each file and directory.
+Each work item is then sent to a disk backed queue to be processed later by a work item consumer.
+
 
 Work item consumer
 
-Comparrison Report Generator
+
+Comparison Report Generator
+Given data stored in the MongoDb - generate comparison reports
 
 
 How to run

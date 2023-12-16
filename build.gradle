@@ -18,8 +18,8 @@ dependencies {
     implementation("org.slf4j:slf4j-api:2.0.9")
     implementation("ch.qos.logback:logback-classic:1.4.14")
     implementation("commons-collections:commons-collections:3.2.2")
-    implementation ("org.mapdb:mapdb:3.0.10")
-    implementation ("com.rabbitmq:amqp-client:5.20.0")
+    implementation("org.infobip.lib:popout:2.1.0") // Disk backed queue for producer/consumer pattern for work items
+    implementation ("org.mongodb:mongodb-driver-sync:4.4.0") // NoSQL DB for storing file/folder hash results
 
 
     testImplementation("org.hamcrest:hamcrest-all:1.3")

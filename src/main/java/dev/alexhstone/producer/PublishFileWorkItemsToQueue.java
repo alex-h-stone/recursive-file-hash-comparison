@@ -3,12 +3,10 @@ package dev.alexhstone.producer;
 import dev.alexhstone.model.queue.FileWorkItem;
 import dev.alexhstone.util.DirectoryValidator;
 import dev.alexhstone.util.PathWalker;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -25,56 +23,37 @@ public class PublishFileWorkItemsToQueue {
 
     public static void main(String[] args) {
         DirectoryValidator directoryValidator = new DirectoryValidator();
-        Set<Path> workingDirectories = Arrays.stream(args).map(new Function<String, Path>() {
-            @Override
-            public Path apply(String string) {
-                return directoryValidator.validateExists(string);
-            }
-        }).collect(Collectors.toSet());
+        Set<Path> workingDirectories = Arrays.stream(args)
+                .map(directoryValidator::validateExists)
+                .collect(Collectors.toSet());
 
-        PublishFileWorkItemsToQueue publishFileWorkItemsToQueue = new PublishFileWorkItemsToQueue(workingDirectories);
+        PublishFileWorkItemsToQueue publishFileWorkItemsToQueue =
+                new PublishFileWorkItemsToQueue(workingDirectories);
         publishFileWorkItemsToQueue.execute();
 
     }
 
     private void execute() {
-        // TODO traverse file tree/path and populate queue with all work items
-
         workingDirectories
                 .parallelStream()
                 .forEach(processWorkingDirectory());
     }
 
-    @NotNull
     private Consumer<Path> processWorkingDirectory() {
-        return new Consumer<Path>() {
-            @Override
-            public void accept(Path workingDirectory) {
-                getStream(workingDirectory)
-                        .forEach(fileWorkItem -> System.out.println("fileWorkItem: " + fileWorkItem));
-            }
-        };
+        // TODO add write to
+        return workingDirectory -> toFileWorkItemsStream(workingDirectory)
+                .forEach(fileWorkItem -> System.out.println("fileWorkItem: " + fileWorkItem));
     }
 
-    @NotNull
-    private Stream<FileWorkItem> getStream(Path workingDirectory) {
+    private Stream<FileWorkItem> toFileWorkItemsStream(Path workingDirectory) {
         Function<File, FileWorkItem> toFileWorkItemMapper = new FileToFileWorkItemMapper()
                 .asFunction(workingDirectory);
+        PathWalker pathWalker = new PathWalker(workingDirectory);
 
-        Stream<Optional<FileWorkItem>> fileWorkItems =
-                new PathWalker(workingDirectory)
-                        .walk()
-                        .parallel()
-                        .map(path -> {
-                            File file = path.toFile();
-                            if (file.isFile()) {
-                                return Optional.of(toFileWorkItemMapper.apply(file));
-                            }
-                            return Optional.empty();
-                        });
-
-        return fileWorkItems
-                .filter(Optional::isPresent)
-                .map(Optional::get);
+        return pathWalker
+                .walk()
+                .parallel()
+                .map(Path::toFile)
+                .map(toFileWorkItemMapper::apply);
     }
 }

@@ -16,12 +16,12 @@ public class FileToFileWorkItemMapper {
 
     public FileWorkItem map(Path workingDirectory, File file) {
         Path validWorkingDirectory = directoryValidator.validateExists(workingDirectory);
-        File validFile = fileValidator.validateExists(file);
+        File fileExists = fileValidator.validateExists(file);
 
         return FileWorkItem.builder()
-                .absolutePathToFile(validFile.getAbsolutePath())
+                .absolutePathToFile(fileExists.getAbsolutePath())
                 .absolutePathToWorkingDirectory(validWorkingDirectory.toFile().getAbsolutePath())
-                .fileSizeInBytes(FileUtils.sizeOfAsBigInteger(validFile))
+                .fileSizeInBytes(FileUtils.sizeOfAsBigInteger(fileExists))
                 .build();
     }
 
