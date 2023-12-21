@@ -28,7 +28,7 @@ public class CompareDirectories {
         this.leftAbsolutePath = leftAbsolutePath;
         this.rightAbsolutePath = rightAbsolutePath;
         this.persistAsJSONToFile = new PersistAsJsonToFile(Paths.get(reportDirectoryAbsolutePath));
-        this.fileHashResultRepository = new FileHashResultRepository(Paths.get(reportDirectoryAbsolutePath));
+        this.fileHashResultRepository = new FileHashResultRepository();
         this.recursiveFileHashCalculator = new RecursiveFileHashCalculator();
     }
 
@@ -48,8 +48,9 @@ public class CompareDirectories {
 
 
         DiffResultsCalculator diffResultsCalculator = new DiffResultsCalculator();
-        HashDiffResults hashDiffResults = diffResultsCalculator.compareResults(fileHashResultRepository.getLeftKeys(),
-                fileHashResultRepository.getRightKeys());
+        HashDiffResults hashDiffResults = null;
+        //diffResultsCalculator.compareResults(fileHashResultRepository.getLeftKeys(),
+          //      fileHashResultRepository.getRightKeys());
         // TODO create deserialise and read logic
         persistAsJSONToFile.persist(hashDiffResults, "diffResults.json");
 

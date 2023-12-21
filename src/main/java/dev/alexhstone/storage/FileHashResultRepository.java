@@ -12,9 +12,6 @@ import dev.alexhstone.model.FileHashResult;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 
-import java.nio.file.Path;
-import java.util.Set;
-
 @Slf4j
 public class FileHashResultRepository {
 
@@ -23,7 +20,7 @@ public class FileHashResultRepository {
     private final HashCalculator hashCalculator;
     private final MongoCollection<Document> collection;
 
-    public FileHashResultRepository(Path repositoryStorageDirectory) {
+    public FileHashResultRepository() {
         MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
 
         MongoDatabase database = mongoClient.getDatabase("yourDatabase");
@@ -37,9 +34,10 @@ public class FileHashResultRepository {
         String json = gson.toJson(fileHashResult);
         final String hashCode = toHash(fileHashResult);
 
-        Document existing = collection.find(new Document("_id", fileHashResult.getAbsolutePathToFile())).first();
+        String id = fileHashResult.getId();
+        Document existing = collection.find(new Document("_id", id)).first();
         if (existing == null || existing.isEmpty()) {
-            collection.insertOne(fileHashResult)
+            collection.insertOne(new Document(id, json));
         }
 
         log.warn("Found hash collision as [{}] is already in the repository",
@@ -50,13 +48,5 @@ public class FileHashResultRepository {
 
     private String toHash(FileHashResult fileHashResult) {
         return hashCalculator.calculateHashFor(fileHashResult.getRelativePathToFile());
-    }
-
-    public Set<String> getLeftKeys() {
-        return leftMap.getKeys();
-    }
-
-    public Set<String> getRightKeys() {
-        return rightMap.getKeys();
     }
 }

@@ -10,6 +10,8 @@ import java.math.BigInteger;
 @Builder
 public class FileHashResult {
 
+    String id;
+
     String fileName;
 
     String relativePathToFile;
