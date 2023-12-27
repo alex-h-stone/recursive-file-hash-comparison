@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.alexhstone.model.FileWorkItemSerializerAndDeserializer;
 import dev.alexhstone.model.queue.FileWorkItem;
+import dev.alexhstone.producer.ActiveMQPublisher;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;

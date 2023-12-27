@@ -1,4 +1,4 @@
-package dev.alexhstone.storage;
+package dev.alexhstone.producer;
 
 import dev.alexhstone.config.ApplicationConfiguration;
 import org.apache.activemq.ActiveMQConnectionFactory;

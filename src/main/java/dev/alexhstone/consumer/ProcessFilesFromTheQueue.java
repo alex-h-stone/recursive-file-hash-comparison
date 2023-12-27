@@ -15,18 +15,18 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 @Slf4j
-public class ProcessFilesOnQueue {
+public class ProcessFilesFromTheQueue {
 
     private final FileWorkItemQueueFacade fileWorkItemQueueFacade;
     private final FileHashResultRepository fileHashResultRepository;
     private final FileHashResultCalculator fileHashResultCalculator;
 
     public static void main(String[] args) {
-        ProcessFilesOnQueue processFilesOnQueue = new ProcessFilesOnQueue();
-        processFilesOnQueue.execute();
+        ProcessFilesFromTheQueue processFilesFromTheQueue = new ProcessFilesFromTheQueue();
+        processFilesFromTheQueue.execute();
     }
 
-    public ProcessFilesOnQueue() {
+    public ProcessFilesFromTheQueue() {
         fileWorkItemQueueFacade = new FileWorkItemQueueFacade();
         fileHashResultRepository = new FileHashResultRepository();
         fileHashResultCalculator = new FileHashResultCalculator(new HashDetailsCalculator());
