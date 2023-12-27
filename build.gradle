@@ -18,7 +18,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api:2.0.9")
     implementation("ch.qos.logback:logback-classic:1.4.14")
     implementation("commons-collections:commons-collections:3.2.2")
-    implementation("org.infobip.lib:popout:2.1.0") // Disk backed queue for producer/consumer pattern for work items
+    implementation 'org.apache.activemq:activemq-client:5.18.3'
     implementation ("org.mongodb:mongodb-driver-sync:4.4.0") // NoSQL DB for storing file/folder hash results
 
 

@@ -1,5 +1,7 @@
 package dev.alexhstone.util;
 
+import dev.alexhstone.validation.DirectoryValidator;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

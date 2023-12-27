@@ -2,8 +2,8 @@ package dev.alexhstone.producer;
 
 import dev.alexhstone.model.queue.FileWorkItem;
 import dev.alexhstone.storage.FileWorkItemQueueFacade;
-import dev.alexhstone.util.DirectoryValidator;
 import dev.alexhstone.util.PathWalker;
+import dev.alexhstone.validation.DirectoryValidator;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;

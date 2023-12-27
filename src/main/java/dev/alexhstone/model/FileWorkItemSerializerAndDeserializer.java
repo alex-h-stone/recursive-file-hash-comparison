@@ -12,7 +12,7 @@ import dev.alexhstone.model.queue.FileWorkItem;
 import java.lang.reflect.Type;
 import java.time.Instant;
 
-public class FileWorkItemSerializer implements JsonSerializer<FileWorkItem>, JsonDeserializer<FileWorkItem> {
+public class FileWorkItemSerializerAndDeserializer implements JsonSerializer<FileWorkItem>, JsonDeserializer<FileWorkItem> {
 
     @Override
     public JsonElement serialize(FileWorkItem fileWorkItem,
@@ -23,7 +23,7 @@ public class FileWorkItemSerializer implements JsonSerializer<FileWorkItem>, Jso
         jsonObject.addProperty("absolutePathToFile", fileWorkItem.getAbsolutePathToFile());
         jsonObject.addProperty("absolutePathToWorkingDirectory", fileWorkItem.getAbsolutePathToWorkingDirectory());
         jsonObject.addProperty("fileSizeInBytes", fileWorkItem.getFileSizeInBytes());
-        jsonObject.addProperty("workItemCreationTime", fileWorkItem.getWorkItemCreationTime().toEpochMilli());
+        jsonObject.addProperty("workItemCreationTime", fileWorkItem.getCreationTime().toEpochMilli());
 
         return jsonObject;
     }
@@ -39,7 +39,7 @@ public class FileWorkItemSerializer implements JsonSerializer<FileWorkItem>, Jso
                 .absolutePathToFile(jsonObject.get("absolutePathToFile").getAsString())
                 .absolutePathToWorkingDirectory(jsonObject.get("absolutePathToWorkingDirectory").getAsString())
                 .fileSizeInBytes(jsonObject.get("fileSizeInBytes").getAsBigInteger())
-                .workItemCreationTime(Instant.ofEpochSecond(jsonObject.get("workItemCreationTime").getAsLong())).build();
+                .creationTime(Instant.ofEpochSecond(jsonObject.get("workItemCreationTime").getAsLong())).build();
 
         return fileWorkItem;
     }

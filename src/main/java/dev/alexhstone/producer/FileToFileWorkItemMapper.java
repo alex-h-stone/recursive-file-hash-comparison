@@ -1,8 +1,8 @@
 package dev.alexhstone.producer;
 
 import dev.alexhstone.model.queue.FileWorkItem;
-import dev.alexhstone.util.DirectoryValidator;
-import dev.alexhstone.util.FileValidator;
+import dev.alexhstone.validation.DirectoryValidator;
+import dev.alexhstone.validation.FileValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
@@ -26,9 +26,9 @@ public class FileToFileWorkItemMapper {
                 .absolutePathToFile(fileExists.getAbsolutePath())
                 .absolutePathToWorkingDirectory(validWorkingDirectory.toFile().getAbsolutePath())
                 .fileSizeInBytes(FileUtils.sizeOfAsBigInteger(fileExists))
-                .workItemCreationTime(Instant.now())
+                .creationTime(Instant.now())
                 .build();
-        log.debug("fileWorkItem: [{}]", fileWorkItem);
+        log.debug("Mapped the file [{}] to the fileWorkItem: [{}]", fileExists.getAbsolutePath(), fileWorkItem);
         return fileWorkItem;
     }
 

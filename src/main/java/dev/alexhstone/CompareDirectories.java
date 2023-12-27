@@ -64,7 +64,7 @@ public class CompareDirectories {
 
         log.info("About to calculate hashes for the working directory [{}]", absolutePath);
         recursiveFileHashCalculator.process(workingDirectory,
-                fileHashResult -> fileHashResultRepository.put(location, fileHashResult));
+                fileHashResult -> fileHashResultRepository.put(fileHashResult));
         log.info("Completed calculating the hashes for the working directory [{}]", absolutePath);
     }
 

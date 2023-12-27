@@ -2,6 +2,7 @@ package dev.alexhstone.util;
 
 import dev.alexhstone.exception.InvalidPathException;
 import dev.alexhstone.test.util.FileSystemUtils;
+import dev.alexhstone.validation.DirectoryValidator;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

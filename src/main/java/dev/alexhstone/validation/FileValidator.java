@@ -1,4 +1,4 @@
-package dev.alexhstone.util;
+package dev.alexhstone.validation;
 
 import dev.alexhstone.exception.InvalidPathException;
 

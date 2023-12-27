@@ -18,5 +18,5 @@ public class FileWorkItem {
 
     BigInteger fileSizeInBytes;
 
-    Instant workItemCreationTime;
+    Instant creationTime;
 }

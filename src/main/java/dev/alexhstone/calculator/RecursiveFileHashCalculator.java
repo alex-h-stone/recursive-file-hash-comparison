@@ -1,8 +1,8 @@
 package dev.alexhstone.calculator;
 
 import dev.alexhstone.model.FileHashResult;
-import dev.alexhstone.util.DirectoryValidator;
 import dev.alexhstone.util.PathWalker;
+import dev.alexhstone.validation.DirectoryValidator;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;

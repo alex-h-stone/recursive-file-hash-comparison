@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.math.BigInteger;
 import java.nio.file.Path;
+import java.time.Instant;
 
 @RequiredArgsConstructor
 public class FileHashResultCalculator {
@@ -22,13 +23,16 @@ public class FileHashResultCalculator {
 
         Path relativePath = workingDirectory.relativize(file.toPath().getParent());
 
+        String absolutePathToFile = file.getAbsolutePath();
         return FileHashResult.builder()
+                .id(absolutePathToFile)
                 .fileName(file.getName())
                 .relativePathToFile(relativePath.toString())
-                .absolutePathToFile(file.getAbsolutePath())
+                .absolutePathToFile(absolutePathToFile)
                 .absolutePathToWorkingDirectory(workingDirectory.toFile().getAbsolutePath())
                 .fileSizeInBytes(sizeOfFileInBytes)
                 .fileSize(byteCountToDisplaySize)
+                .creationTime(Instant.now())
                 .hashDetails(hashDetails)
                 .build();
     }

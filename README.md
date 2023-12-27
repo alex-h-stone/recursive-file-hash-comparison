@@ -1,6 +1,6 @@
-Recursive Directory Comparison
+# Recursive Directory Comparison
 
-Tool for determining with a high level of certainty whether 2 directory structures are identical, and highlighting any discrepancies.
+#### Tool for determining with a high level of certainty whether 2 directory structures are identical, and highlighting any discrepancies.
 
 For 2 directories to be considered identical the following conditions must be met:
 1. For every subdirectory on the left of the comparison there must exist a subdirectory on the right with an identical name and identical path relative to it's base/working directory.
@@ -14,24 +14,38 @@ For 2 files to match the following conditions must be met:
 - Identical paths relative to their base/working directories
 4. *Same criteria as 3. with opposite direction of comparison (switch left and right)
 
-Components
+### Components
 
-Work item producer
-Given an absolute path to a working directory, traverse the entire directory structure and create a new Work Item for each file and directory.
-Each work item is then sent to a disk backed queue to be processed later by a work item consumer.
+#### Work item producer
+Given an absolute path to a working directory, traverse the entire directory structure 
+and create a new `Work Item` for each file and each directory.
+Each work item is then sent to a disk backed queue to be processed later by a 
+work item consumer.
 
 
-Work item consumer
+#### Work item consumer
 
 
 Comparison Report Generator
 Given data stored in the MongoDb - generate comparison reports
 
 
-How to run
-TODO
+### Requirements
+- Java 21
+- Mongo DB
+- Apache Active MQ
 
 
+### How to run
+1. Start Apache Active MQ.
+`startActiveMQ.sh
+`
+2. Verify Active MQ via the admin interface http://127.0.0.1:8161/admin/ with 
+default login credentials `admin`/`admin`.
+3. Verify Active MQ via the log file at 
+`C:\Program Files\apache-activemq-5.18.3\data\activemq.log` has activity with recent 
+timestamps.
+4. 
 
 
 The file hashes and other details are then stored in Mongo DB for subsequently producing a variety of reports including:
