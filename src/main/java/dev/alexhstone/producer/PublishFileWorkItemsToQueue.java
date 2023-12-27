@@ -2,6 +2,7 @@ package dev.alexhstone.producer;
 
 import dev.alexhstone.model.queue.FileWorkItem;
 import dev.alexhstone.queue.DurableQueueImpl;
+import dev.alexhstone.queue.QueuePublisher;
 import dev.alexhstone.util.PathWalker;
 import dev.alexhstone.validation.DirectoryValidator;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +21,12 @@ import java.util.stream.Stream;
 @Slf4j
 public class PublishFileWorkItemsToQueue {
 
-    private final DurableQueueImpl queue;
+    private final QueuePublisher queue;
     private final Set<Path> workingDirectories;
 
-    public PublishFileWorkItemsToQueue(DurableQueueImpl durableQueueImpl,
+    public PublishFileWorkItemsToQueue(QueuePublisher queuePublisher,
                                        Set<Path> workingDirectories) {
-        this.queue = durableQueueImpl;
+        this.queue = queuePublisher;
         this.workingDirectories = Collections.unmodifiableSet(workingDirectories);
     }
 

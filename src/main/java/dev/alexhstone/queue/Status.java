@@ -1,4 +1,4 @@
-package dev.alexhstone.producer;
+package dev.alexhstone.queue;
 
 public enum Status {
     SUCCESS,

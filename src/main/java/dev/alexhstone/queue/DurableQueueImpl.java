@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import dev.alexhstone.config.ApplicationConfiguration;
 import dev.alexhstone.model.FileWorkItemSerializerAndDeserializer;
 import dev.alexhstone.model.queue.FileWorkItem;
-import dev.alexhstone.producer.Status;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -98,19 +97,21 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
 
     public Status publish(FileWorkItem fileWorkItem) {
         String workItemAsJson = gson.toJson(fileWorkItem);
-        return publish(workItemAsJson);
+        return publish(fileWorkItem.getId(), workItemAsJson);
     }
 
-    private Status publish(String message) {
-        log.debug("About to publish the message: [{}]", message);
+    private Status publish(String id, String messageText) {
+        log.debug("About to publish the message with ID: [{}] and messageText: [{}]",
+                id, messageText);
 
         TextMessage textMessage;
         try {
-            textMessage = session.createTextMessage(message);
+            textMessage = session.createTextMessage(messageText);
+            textMessage.setJMSMessageID(id);
             producer.send(textMessage);
         } catch (JMSException e) {
-            log.error("Unable to publish the message [{}] because of the error: [{}]",
-                    message, e.getMessage(), e);
+            log.error("Unable to publish the message with ID: [{}] and messageText: [{}] because of the error: [{}]",
+                    id, messageText, e.getMessage(), e);
             return Status.FAILURE;
         }
 
