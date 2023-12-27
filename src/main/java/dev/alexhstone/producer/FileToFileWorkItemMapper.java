@@ -23,10 +23,10 @@ public class FileToFileWorkItemMapper {
 
         FileWorkItem fileWorkItem = FileWorkItem.builder()
                 .id(fileExists.getAbsolutePath())
-                .absolutePathToFile(fileExists.getAbsolutePath())
+                .absolutePath(fileExists.getAbsolutePath())
                 .absolutePathToWorkingDirectory(validWorkingDirectory.toFile().getAbsolutePath())
-                .fileSizeInBytes(FileUtils.sizeOfAsBigInteger(fileExists))
-                .creationTime(Instant.now())
+                .sizeInBytes(FileUtils.sizeOfAsBigInteger(fileExists))
+                .workItemCreationTime(Instant.now())
                 .build();
         log.debug("Mapped the file [{}] to the fileWorkItem: [{}]", fileExists.getAbsolutePath(), fileWorkItem);
         return fileWorkItem;

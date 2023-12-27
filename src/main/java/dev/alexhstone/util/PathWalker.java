@@ -22,7 +22,7 @@ public class PathWalker {
         } catch (IOException e) {
             String message = "Unable to walk the folder hierarchy at [%s] because of: [%s]"
                     .formatted(validRootPath.toAbsolutePath(), e.getMessage());
-            throw new RuntimeException(message);
+            throw new RuntimeException(message, e);
         }
     }
 }

@@ -12,11 +12,11 @@ public class FileWorkItem {
 
     String id;
 
-    String absolutePathToFile;
+    String absolutePath;
 
     String absolutePathToWorkingDirectory;
 
-    BigInteger fileSizeInBytes;
+    BigInteger sizeInBytes;
 
-    Instant creationTime;
+    Instant workItemCreationTime;
 }

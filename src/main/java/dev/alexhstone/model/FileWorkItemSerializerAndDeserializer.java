@@ -20,10 +20,10 @@ public class FileWorkItemSerializerAndDeserializer implements JsonSerializer<Fil
                                  JsonSerializationContext context) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("id", fileWorkItem.getId());
-        jsonObject.addProperty("absolutePathToFile", fileWorkItem.getAbsolutePathToFile());
+        jsonObject.addProperty("absolutePathToFile", fileWorkItem.getAbsolutePath());
         jsonObject.addProperty("absolutePathToWorkingDirectory", fileWorkItem.getAbsolutePathToWorkingDirectory());
-        jsonObject.addProperty("fileSizeInBytes", fileWorkItem.getFileSizeInBytes());
-        jsonObject.addProperty("workItemCreationTime", fileWorkItem.getCreationTime().toEpochMilli());
+        jsonObject.addProperty("fileSizeInBytes", fileWorkItem.getSizeInBytes());
+        jsonObject.addProperty("workItemCreationTime", fileWorkItem.getWorkItemCreationTime().toEpochMilli());
 
         return jsonObject;
     }
@@ -36,10 +36,10 @@ public class FileWorkItemSerializerAndDeserializer implements JsonSerializer<Fil
 
         FileWorkItem fileWorkItem = FileWorkItem.builder()
                 .id(jsonObject.get("id").getAsString())
-                .absolutePathToFile(jsonObject.get("absolutePathToFile").getAsString())
+                .absolutePath(jsonObject.get("absolutePathToFile").getAsString())
                 .absolutePathToWorkingDirectory(jsonObject.get("absolutePathToWorkingDirectory").getAsString())
-                .fileSizeInBytes(jsonObject.get("fileSizeInBytes").getAsBigInteger())
-                .creationTime(Instant.ofEpochSecond(jsonObject.get("workItemCreationTime").getAsLong())).build();
+                .sizeInBytes(jsonObject.get("fileSizeInBytes").getAsBigInteger())
+                .workItemCreationTime(Instant.ofEpochSecond(jsonObject.get("workItemCreationTime").getAsLong())).build();
 
         return fileWorkItem;
     }

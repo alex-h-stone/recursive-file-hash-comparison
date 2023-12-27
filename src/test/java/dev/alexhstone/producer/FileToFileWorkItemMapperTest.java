@@ -4,9 +4,7 @@ import dev.alexhstone.model.queue.FileWorkItem;
 import dev.alexhstone.test.util.FileSystemUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -17,7 +15,9 @@ import java.nio.file.Path;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class FileToFileWorkItemMapperTest {
 
@@ -43,9 +43,9 @@ class FileToFileWorkItemMapperTest {
         assertAll(
                 "Grouped Assertions of FileHashResult",
                 () -> assertNotNull(actualFileWorkItem),
-                () -> assertThat( actualFileWorkItem.getAbsolutePathToFile(),CoreMatchers.containsString("sampleFile.dat")),
+                () -> assertThat( actualFileWorkItem.getAbsolutePath(),CoreMatchers.containsString("sampleFile.dat")),
                 () -> assertThat( actualFileWorkItem.getAbsolutePathToWorkingDirectory(), not(Matchers.isEmptyOrNullString())),
-                () -> assertEquals(BigInteger.ZERO, actualFileWorkItem.getFileSizeInBytes())
+                () -> assertEquals(BigInteger.ZERO, actualFileWorkItem.getSizeInBytes())
         );
     }
 
@@ -58,9 +58,9 @@ class FileToFileWorkItemMapperTest {
         assertAll(
                 "Grouped Assertions of FileHashResult",
                 () -> assertNotNull(actualFileWorkItem),
-                () -> assertThat( actualFileWorkItem.getAbsolutePathToFile(),CoreMatchers.containsString("sampleFile.dat")),
+                () -> assertThat( actualFileWorkItem.getAbsolutePath(),CoreMatchers.containsString("sampleFile.dat")),
                 () -> assertThat( actualFileWorkItem.getAbsolutePathToWorkingDirectory(), not(Matchers.isEmptyOrNullString())),
-                () -> assertEquals(BigInteger.valueOf(18), actualFileWorkItem.getFileSizeInBytes())
+                () -> assertEquals(BigInteger.valueOf(18), actualFileWorkItem.getSizeInBytes())
         );
     }
 
@@ -74,9 +74,9 @@ class FileToFileWorkItemMapperTest {
         assertAll(
                 "Grouped Assertions of FileHashResult",
                 () -> assertNotNull(actualFileWorkItem),
-                () -> assertThat( actualFileWorkItem.getAbsolutePathToFile(),CoreMatchers.containsString("sampleFile.dat")),
+                () -> assertThat( actualFileWorkItem.getAbsolutePath(),CoreMatchers.containsString("sampleFile.dat")),
                 () -> assertThat( actualFileWorkItem.getAbsolutePathToWorkingDirectory(), Matchers.containsString("directoryOne")),
-                () -> assertEquals(BigInteger.valueOf(17), actualFileWorkItem.getFileSizeInBytes())
+                () -> assertEquals(BigInteger.valueOf(17), actualFileWorkItem.getSizeInBytes())
         );
     }
 }

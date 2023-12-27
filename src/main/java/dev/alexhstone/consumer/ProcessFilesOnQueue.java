@@ -42,10 +42,11 @@ public class ProcessFilesOnQueue {
                 FileWorkItem fileWorkItem = fileWorkItemOptional.get();
                 log.info("About to process the fileWorkItem: [{}]", fileWorkItem);
 
+                // TODO add logic to use last modified date/time and size to save recalculating hashes?
                 if (!fileHashResultRepository.isAlreadyPresent(fileWorkItem)) {
                     log.info("Not already present in cache so processing");
                     Path workingDirectory = new DirectoryValidator().validateExists(fileWorkItem.getAbsolutePathToWorkingDirectory());
-                    File file = new FileValidator().validateExists(fileWorkItem.getAbsolutePathToFile());
+                    File file = new FileValidator().validateExists(fileWorkItem.getAbsolutePath());
                     FileHashResult hashResult = fileHashResultCalculator.process(workingDirectory, file);
                     fileHashResultRepository.put(hashResult);
                 } else {

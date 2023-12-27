@@ -1,7 +1,6 @@
 package dev.alexhstone.producer;
 
 import dev.alexhstone.model.queue.FileWorkItem;
-import dev.alexhstone.storage.FileWorkItemQueueFacade;
 import dev.alexhstone.util.PathWalker;
 import dev.alexhstone.validation.DirectoryValidator;
 import lombok.extern.slf4j.Slf4j;
@@ -19,23 +18,28 @@ import java.util.stream.Stream;
 @Slf4j
 public class PublishFileWorkItemsToQueue {
 
-    private final FileWorkItemQueueFacade queueFacade;
+    private final DurableQueue queue;
     private final Set<Path> workingDirectories;
 
-    public PublishFileWorkItemsToQueue(FileWorkItemQueueFacade queueFacade,
+    public PublishFileWorkItemsToQueue(DurableQueue durableQueue,
                                        Set<Path> workingDirectories) {
-        this.queueFacade = queueFacade;
+        this.queue = durableQueue;
         this.workingDirectories = Collections.unmodifiableSet(workingDirectories);
     }
 
     public static void main(String[] args) {
+        log.debug("About to publish file work items from the working directories [{}] to the queue",
+                Arrays.asList(args));
         DirectoryValidator directoryValidator = new DirectoryValidator();
         Set<Path> workingDirectories = Arrays.stream(args)
                 .map(directoryValidator::validateExists)
                 .collect(Collectors.toSet());
 
+        DurableQueue durableQueue = new DurableQueue();
+        durableQueue.initialise();
+
         PublishFileWorkItemsToQueue publishFileWorkItemsToQueue =
-                new PublishFileWorkItemsToQueue(new FileWorkItemQueueFacade(),
+                new PublishFileWorkItemsToQueue(durableQueue,
                         workingDirectories);
         publishFileWorkItemsToQueue.execute();
     }
@@ -47,15 +51,15 @@ public class PublishFileWorkItemsToQueue {
     }
 
     private Consumer<Path> processWorkingDirectory() {
-        // TODO add write to
         return workingDirectory -> toFileWorkItemsStream(workingDirectory)
-                .forEach(new Consumer<FileWorkItem>() {
-                    @Override
-                    public void accept(FileWorkItem fileWorkItem) {
-                        log.debug("About to add FileWorkItem to the queue: {}", fileWorkItem);
-                        queueFacade.publish(fileWorkItem);
-                    }
-                });
+                .forEach(publishToQueue());
+    }
+
+    private Consumer<FileWorkItem> publishToQueue() {
+        return fileWorkItem -> {
+            log.debug("About to add FileWorkItem to the queue: {}", fileWorkItem);
+            queue.publish(fileWorkItem);
+        };
     }
 
     private Stream<FileWorkItem> toFileWorkItemsStream(Path workingDirectory) {
@@ -67,6 +71,6 @@ public class PublishFileWorkItemsToQueue {
                 .walk()
                 .parallel()
                 .map(Path::toFile)
-                .map(toFileWorkItemMapper::apply);
+                .map(toFileWorkItemMapper);
     }
 }

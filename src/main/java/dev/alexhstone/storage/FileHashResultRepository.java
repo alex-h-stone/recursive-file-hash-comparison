@@ -53,7 +53,7 @@ public class FileHashResultRepository {
 
         FileHashResult hashResult = existingFileHashResultOptional.get();
 
-        return fileWorkItem.getFileSizeInBytes().equals(hashResult.getFileSizeInBytes());
+        return fileWorkItem.getSizeInBytes().equals(hashResult.getFileSizeInBytes());
     }
 
     private Optional<FileHashResult> retrieveFileHashResultById(String id) {
