@@ -9,9 +9,10 @@ import dev.alexhstone.storage.FileHashResultRepository;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
-public class ProcessFilesFromTheQueue {
+public class ProcessWorkItemsFromTheQueue {
 
     private final QueueConsumer queueConsumer;
     private final FileHashResultRepository fileHashResultRepository;
@@ -19,11 +20,11 @@ public class ProcessFilesFromTheQueue {
 
     public static void main(String[] args) {
         DurableQueueImpl queue = new DurableQueueImpl();
-        ProcessFilesFromTheQueue processFilesFromTheQueue = new ProcessFilesFromTheQueue(queue);
-        processFilesFromTheQueue.execute();
+        ProcessWorkItemsFromTheQueue processWorkItemsFromTheQueue = new ProcessWorkItemsFromTheQueue(queue);
+        processWorkItemsFromTheQueue.execute();
     }
 
-    public ProcessFilesFromTheQueue(QueueConsumer queueConsumer) {
+    public ProcessWorkItemsFromTheQueue(QueueConsumer queueConsumer) {
         this.queueConsumer = queueConsumer;
         fileHashResultRepository = new FileHashResultRepository();
         fileHashResultCalculator = new FileHashResultCalculator(new HashDetailsCalculator());
@@ -32,13 +33,14 @@ public class ProcessFilesFromTheQueue {
     private void execute() {
         queueConsumer.initialise();
         log.info("About to process work items from the queue");
-        boolean workItemToProcess = true;
+        AtomicInteger numberOfContinuousUnsuccessfulDequeues = new AtomicInteger(0);
         do {
             Optional<FileWorkItem> fileWorkItemOptional = queueConsumer.consumeMessage();
             if (fileWorkItemOptional.isPresent()) {
 
                 FileWorkItem fileWorkItem = fileWorkItemOptional.get();
-                log.info("About to process the fileWorkItem: [{}]", fileWorkItem);
+                log.info("About to process the work item with ID: [{}]", fileWorkItem.getId());
+                numberOfContinuousUnsuccessfulDequeues.set(0);
 
                 // TODO add logic to use last modified date/time and size to save recalculating hashes?
                 /*if (!fileHashResultRepository.isAlreadyPresent(fileWorkItem)) {
@@ -50,10 +52,11 @@ public class ProcessFilesFromTheQueue {
                 } else {
                     log.info("Work item already present in cache so NOT processing");
                 }*/
+                log.info("Completed processing the work item with ID: [{}]", fileWorkItem.getId());
             } else {
-                workItemToProcess = false;
+                numberOfContinuousUnsuccessfulDequeues.incrementAndGet();
             }
-        } while (workItemToProcess);
+        } while (numberOfContinuousUnsuccessfulDequeues.get() < 50);
 
         log.info("Completed processing all work items on the queue");
         queueConsumer.destroy();

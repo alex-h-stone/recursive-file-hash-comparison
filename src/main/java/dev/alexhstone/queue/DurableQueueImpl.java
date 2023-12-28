@@ -10,6 +10,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.jms.Connection;
+import javax.jms.DeliveryMode;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
@@ -25,6 +26,9 @@ import java.util.Optional;
 
 @Slf4j
 public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
+
+    private static final int NORMAL_PRIORITY = 4;
+    private static final long TIME_TO_LIVE_SIX_HOURS = Duration.ofHours(6).toMillis();
 
     private final String brokerURL;
     private final Gson gson;
@@ -48,7 +52,7 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
                 .workItemCreationTime(Instant.now())
                 .build());
         Optional<FileWorkItem> workItem = queue.consumeMessage();
-        log.info("workItem: {}", workItem);
+        log.info("Consumed workItem: {}", workItem);
         queue.destroy();
     }
 
@@ -69,9 +73,10 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
         try {
             connection = connectionFactory.createConnection();
             connection.start();
-            session = connection.createSession(Session.CLIENT_ACKNOWLEDGE);
+            session = connection.createSession(Session.AUTO_ACKNOWLEDGE);
             destination = session.createQueue(queueName);
             producer = session.createProducer(destination);
+            producer.setDeliveryMode(DeliveryMode.PERSISTENT);
         } catch (JMSException e) {
             String message = "Unable to initialise the DurableQueueImpl with brokerURL [%s] because of the  error: [%s]"
                     .formatted(brokerURL, e.getMessage());
@@ -108,7 +113,7 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
         try {
             textMessage = session.createTextMessage(messageText);
             textMessage.setJMSMessageID(id);
-            producer.send(textMessage);
+            producer.send(textMessage, DeliveryMode.PERSISTENT, NORMAL_PRIORITY, TIME_TO_LIVE_SIX_HOURS);
         } catch (JMSException e) {
             log.error("Unable to publish the message with ID: [{}] and messageText: [{}] because of the error: [{}]",
                     id, messageText, e.getMessage(), e);
@@ -121,13 +126,16 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
     public Optional<FileWorkItem> consumeMessage() {
         try {
             MessageConsumer consumer = session.createConsumer(destination, StringUtils.EMPTY);
-            Message message = consumer.receive(Duration.ofSeconds(2).toMillis());
-            if (message instanceof TextMessage) {
-                TextMessage textMessage = (TextMessage) message;
+            Message message = consumer.receive();
+            if (message == null) {
+                log.info("Received null message, so returning empty");
+                return Optional.empty();
+            }
+
+            if (message instanceof TextMessage textMessage) {
                 String messageText = textMessage.getText();
                 FileWorkItem fileWorkItem = gson.fromJson(messageText, FileWorkItem.class);
-                message.acknowledge();
-                log.debug("Successfully dequeued and acknowledged the work item with ID [{}]", fileWorkItem.getId());
+                log.debug("Successfully dequeued the work item with ID [{}]", fileWorkItem.getId());
                 return Optional.of(fileWorkItem);
             }
             log.error("Unable to cast the Message: [{}] as a TextMessage", message);

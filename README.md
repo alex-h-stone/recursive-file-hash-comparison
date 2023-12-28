@@ -37,9 +37,10 @@ Given data stored in the MongoDb - generate comparison reports
 
 
 ### How to run
-1. Start Apache Active MQ.
-`startActiveMQ.sh
-`
+1. Start Apache Active MQ via:
+``` powershell
+./startActiveMQ.ps1
+```
 2. Verify Active MQ via the admin interface http://127.0.0.1:8161/admin/ with 
 default login credentials `admin`/`admin`.
 3. Verify Active MQ via the log file at 
