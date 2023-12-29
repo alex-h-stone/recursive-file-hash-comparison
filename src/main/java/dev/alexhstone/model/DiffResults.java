@@ -1,6 +1,6 @@
 package dev.alexhstone.model;
 
-import dev.alexhstone.model.datastore.WorkItemHashResult;
+import dev.alexhstone.model.datastore.HashResult;
 import lombok.Builder;
 import lombok.Value;
 
@@ -10,6 +10,6 @@ import java.util.List;
 @Builder
 public class DiffResults {
 
-    List<WorkItemHashResult>  leftFilesNotPresentInRight;
-    List<WorkItemHashResult>  rightFilesNotPresentInLeft;
+    List<HashResult>  leftFilesNotPresentInRight;
+    List<HashResult>  rightFilesNotPresentInLeft;
 }

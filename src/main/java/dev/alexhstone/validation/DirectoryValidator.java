@@ -4,9 +4,10 @@ import dev.alexhstone.exception.InvalidPathException;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class DirectoryValidator {
+
+    private final PathValidator pathValidator = new PathValidator();
 
     public Path validateExists(Path path) {
         File file = path.toFile();
@@ -24,7 +25,7 @@ public class DirectoryValidator {
     }
 
     public Path validateExists(String absolutePath) {
-        Path path = Paths.get(absolutePath);
-        return validateExists(path);
+        Path validatedPath = pathValidator.validateExists(absolutePath);
+        return validateExists(validatedPath);
     }
 }

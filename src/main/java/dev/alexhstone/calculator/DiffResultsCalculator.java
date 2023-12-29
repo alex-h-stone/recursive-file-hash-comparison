@@ -2,7 +2,7 @@ package dev.alexhstone.calculator;
 
 import dev.alexhstone.model.FolderHierarchy;
 import dev.alexhstone.model.HashDiffResults;
-import dev.alexhstone.model.datastore.WorkItemHashResult;
+import dev.alexhstone.model.datastore.HashResult;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -38,33 +38,33 @@ public class DiffResultsCalculator {
                 .build();
     }
 
-    private Set<WorkItemHashResult> getFileHashResults(FolderHierarchy folderHierarchy) {
-        List<WorkItemHashResult> workItemHashResultsList = folderHierarchy.getWorkItemHashResults();
-        Set<WorkItemHashResult> workItemHashResultsSet = new HashSet<>(workItemHashResultsList);
+    private Set<HashResult> getFileHashResults(FolderHierarchy folderHierarchy) {
+        List<HashResult> hashResultsList = folderHierarchy.getHashResults();
+        Set<HashResult> hashResultsSet = new HashSet<>(hashResultsList);
 
-        if (workItemHashResultsList.size() == workItemHashResultsSet.size()) {
-            return workItemHashResultsSet;
+        if (hashResultsList.size() == hashResultsSet.size()) {
+            return hashResultsSet;
         }
 
-        Map<WorkItemHashResult, Long> countOfFileHashResult = new HashMap<>();
-        for (WorkItemHashResult workItemHashResult : workItemHashResultsList) {
-            countOfFileHashResult.putIfAbsent(workItemHashResult, 0L);
+        Map<HashResult, Long> countOfFileHashResult = new HashMap<>();
+        for (HashResult hashResult : hashResultsList) {
+            countOfFileHashResult.putIfAbsent(hashResult, 0L);
 
-            Long currentCount = countOfFileHashResult.get(workItemHashResult);
-            countOfFileHashResult.put(workItemHashResult, currentCount + 1);
+            Long currentCount = countOfFileHashResult.get(hashResult);
+            countOfFileHashResult.put(hashResult, currentCount + 1);
         }
-        List<Map.Entry<WorkItemHashResult, Long>> duplicates = countOfFileHashResult
+        List<Map.Entry<HashResult, Long>> duplicates = countOfFileHashResult
                 .entrySet()
                 .parallelStream()
-                .filter(new Predicate<Map.Entry<WorkItemHashResult, Long>>() {
+                .filter(new Predicate<Map.Entry<HashResult, Long>>() {
                     @Override
-                    public boolean test(Map.Entry<WorkItemHashResult, Long> fileHashResultLongEntry) {
+                    public boolean test(Map.Entry<HashResult, Long> fileHashResultLongEntry) {
                         return fileHashResultLongEntry.getValue() > 1;
                     }
                 })
                 .toList();
 
-        String string = "Expected sizes of List and Set to match, found unexpected equivalent files in workItemHashResultsList: [%s]"
+        String string = "Expected sizes of List and Set to match, found unexpected equivalent files in hashResultsList: [%s]"
                 .formatted(duplicates);
         throw new IllegalStateException(string);
     }

@@ -1,6 +1,5 @@
 package dev.alexhstone.integration;
 
-import dev.alexhstone.CompareDirectories;
 import dev.alexhstone.model.DiffResults;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;

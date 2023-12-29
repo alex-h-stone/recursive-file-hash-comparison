@@ -1,4 +1,4 @@
-package dev.alexhstone.calculator;
+package dev.alexhstone.consumer;
 
 import dev.alexhstone.exception.InvalidFileException;
 import dev.alexhstone.util.HashAlgorithm;

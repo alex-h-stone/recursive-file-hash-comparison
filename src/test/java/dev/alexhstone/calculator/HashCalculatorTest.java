@@ -1,5 +1,6 @@
 package dev.alexhstone.calculator;
 
+import dev.alexhstone.consumer.HashCalculator;
 import dev.alexhstone.exception.InvalidFileException;
 import dev.alexhstone.test.util.FileSystemUtils;
 import org.apache.commons.lang3.StringUtils;

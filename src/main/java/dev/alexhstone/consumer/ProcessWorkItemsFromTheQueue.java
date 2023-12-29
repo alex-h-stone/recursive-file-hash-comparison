@@ -1,8 +1,7 @@
 package dev.alexhstone.consumer;
 
-import dev.alexhstone.calculator.FileHashResultCalculator;
-import dev.alexhstone.calculator.HashDetailsCalculator;
 import dev.alexhstone.datastore.WorkItemHashResultRepository;
+import dev.alexhstone.model.datastore.HashResult;
 import dev.alexhstone.model.queue.WorkItem;
 import dev.alexhstone.queue.DurableQueueImpl;
 import dev.alexhstone.queue.QueueConsumer;
@@ -15,8 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ProcessWorkItemsFromTheQueue {
 
     private final QueueConsumer queueConsumer;
-    private final WorkItemHashResultRepository workItemHashResultRepository;
-    private final FileHashResultCalculator fileHashResultCalculator;
+    private final WorkItemHashResultRepository repository;
+    private final WorkItemToHashResultMapper mapper;
 
     public static void main(String[] args) {
         DurableQueueImpl queue = new DurableQueueImpl();
@@ -26,8 +25,8 @@ public class ProcessWorkItemsFromTheQueue {
 
     public ProcessWorkItemsFromTheQueue(QueueConsumer queueConsumer) {
         this.queueConsumer = queueConsumer;
-        workItemHashResultRepository = new WorkItemHashResultRepository();
-        fileHashResultCalculator = new FileHashResultCalculator(new HashDetailsCalculator());
+        repository = new WorkItemHashResultRepository();
+        mapper = new WorkItemToHashResultMapper();
     }
 
     private void execute() {
@@ -42,16 +41,14 @@ public class ProcessWorkItemsFromTheQueue {
                 log.info("About to process the work item with ID: [{}]", workItem.getId());
                 numberOfContinuousUnsuccessfulDequeues.set(0);
 
-                // TODO add logic to use last modified date/time and size to save recalculating hashes?
-                /*if (!workItemHashResultRepository.isAlreadyPresent(workItem)) {
-                    log.info("Not already present in cache so processing");
-                    Path workingDirectory = new DirectoryValidator().validateExists(workItem.getAbsolutePathToWorkingDirectory());
-                    File file = new FileValidator().validateExists(workItem.getAbsolutePath());
-                    WorkItemHashResult hashResult = fileHashResultCalculator.process(workingDirectory, file);
-                    workItemHashResultRepository.put(hashResult);
-                } else {
-                    log.info("Work item already present in cache so NOT processing");
-                }*/
+                if (repository.hasAlreadyBeenCalculated(workItem)) {
+                    log.debug("Work item with ID [{}] has already been calculated so NOT processing",
+                            workItem.getId());
+                    continue;
+                }
+
+                HashResult hashResult = mapper.map(workItem);
+                repository.put(hashResult);
                 log.info("Completed processing the work item with ID: [{}]", workItem.getId());
             } else {
                 numberOfContinuousUnsuccessfulDequeues.incrementAndGet();

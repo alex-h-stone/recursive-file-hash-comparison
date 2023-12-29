@@ -1,7 +1,7 @@
 package dev.alexhstone.model;
 
 
-import dev.alexhstone.model.datastore.WorkItemHashResult;
+import dev.alexhstone.model.datastore.HashResult;
 import lombok.Builder;
 import lombok.Value;
 
@@ -11,5 +11,5 @@ import java.util.List;
 @Builder
 public class FolderHierarchy {
 
-    List<WorkItemHashResult> workItemHashResults;
+    List<HashResult> hashResults;
 }

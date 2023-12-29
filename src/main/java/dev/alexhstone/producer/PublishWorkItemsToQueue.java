@@ -19,13 +19,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
-public class PublishFileWorkItemsToQueue {
+public class PublishWorkItemsToQueue {
 
     private final QueuePublisher queue;
     private final Set<Path> workingDirectories;
 
-    public PublishFileWorkItemsToQueue(QueuePublisher queuePublisher,
-                                       Set<Path> workingDirectories) {
+    public PublishWorkItemsToQueue(QueuePublisher queuePublisher,
+                                   Set<Path> workingDirectories) {
         this.queue = queuePublisher;
         this.workingDirectories = Collections.unmodifiableSet(workingDirectories);
     }
@@ -41,17 +41,17 @@ public class PublishFileWorkItemsToQueue {
                 .map(directoryValidator::validateExists)
                 .collect(Collectors.toSet());
 
-        PublishFileWorkItemsToQueue publishFileWorkItemsToQueue =
-                new PublishFileWorkItemsToQueue(new DurableQueueImpl(),
+        PublishWorkItemsToQueue publishWorkItemsToQueue =
+                new PublishWorkItemsToQueue(new DurableQueueImpl(),
                         validatedWorkingDirectories);
-        publishFileWorkItemsToQueue.execute();
+        publishWorkItemsToQueue.execute();
     }
 
     private void execute() {
         queue.initialise();
         workingDirectories
                 .parallelStream()
-                .forEach(workingDirectory -> toStreamOfFileWorkItems(workingDirectory)
+                .forEach(workingDirectory -> toStreamOfWorkItems(workingDirectory)
                         .forEach(publishToQueue()));
         queue.destroy();
     }
@@ -63,7 +63,7 @@ public class PublishFileWorkItemsToQueue {
         };
     }
 
-    private Stream<WorkItem> toStreamOfFileWorkItems(Path workingDirectory) {
+    private Stream<WorkItem> toStreamOfWorkItems(Path workingDirectory) {
         Function<File, WorkItem> toFileWorkItemMapper = new FileToWorkItemMapper()
                 .asFunction(workingDirectory);
         PathWalker pathWalker = new PathWalker(workingDirectory);

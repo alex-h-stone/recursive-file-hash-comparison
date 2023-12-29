@@ -1,8 +1,7 @@
 package dev.alexhstone;
 
-import dev.alexhstone.calculator.RecursiveFileHashCalculator;
 import dev.alexhstone.exception.InvalidFileHashPathException;
-import dev.alexhstone.model.datastore.WorkItemHashResult;
+import dev.alexhstone.model.datastore.HashResult;
 import dev.alexhstone.test.util.FileSystemUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
@@ -59,18 +58,18 @@ class RecursiveFileHashReportGeneratorTest {
 
     @Test
     void shouldGenerateAnEmptyListForAnEmptyFolder() {
-        Set<WorkItemHashResult> workItemHashResults = process(temporaryDirectory.toFile().getAbsolutePath());
+        Set<HashResult> hashResults = process(temporaryDirectory.toFile().getAbsolutePath());
 
-        assertThat(workItemHashResults, Matchers.empty());
+        assertThat(hashResults, Matchers.empty());
     }
 
     @Test
     void shouldGenerateASingleResultForSingleFileInAFolder() {
         createNonEmptyFile("emptyFile.txt");
 
-        Set<WorkItemHashResult> workItemHashResults = process(temporaryDirectory.toFile().getAbsolutePath());
+        Set<HashResult> hashResults = process(temporaryDirectory.toFile().getAbsolutePath());
 
-        assertThat(workItemHashResults, Matchers.hasSize(1));
+        assertThat(hashResults, Matchers.hasSize(1));
     }
 
     @Test
@@ -78,13 +77,13 @@ class RecursiveFileHashReportGeneratorTest {
         createNonEmptyFile("emptyFile1.txt");
         createNonEmptyFile("emptyFile2.txt");
 
-        Set<WorkItemHashResult> workItemHashResults = process(temporaryDirectory.toFile().getAbsolutePath());
+        Set<HashResult> hashResults = process(temporaryDirectory.toFile().getAbsolutePath());
 
-        assertThat(workItemHashResults, Matchers.hasSize(2));
+        assertThat(hashResults, Matchers.hasSize(2));
     }
 
-    private Set<WorkItemHashResult> process(String path) {
-        Set<WorkItemHashResult> hashResults = Collections.synchronizedSet(new HashSet<>());
+    private Set<HashResult> process(String path) {
+        Set<HashResult> hashResults = Collections.synchronizedSet(new HashSet<>());
 
         reportGenerator.process(Paths.get(path), hashResults::add);
 

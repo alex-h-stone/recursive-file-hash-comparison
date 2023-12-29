@@ -1,6 +1,5 @@
 package dev.alexhstone.model.datastore;
 
-import dev.alexhstone.model.HashDetails;
 import lombok.Builder;
 import lombok.Value;
 
@@ -9,7 +8,7 @@ import java.time.Instant;
 
 @Value
 @Builder
-public class WorkItemHashResult {
+public class HashResult {
 
     String id;
     String name;
@@ -18,6 +17,8 @@ public class WorkItemHashResult {
     String relativePath;
     BigInteger sizeInBytes;
     String size;
+    Instant workItemCreationTime;
     Instant creationTime;
-    HashDetails hashDetails;
+    String hashValue;
+    String hashingAlgorithmName;
 }

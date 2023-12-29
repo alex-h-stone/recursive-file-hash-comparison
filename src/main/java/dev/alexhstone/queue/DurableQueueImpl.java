@@ -1,10 +1,9 @@
 package dev.alexhstone.queue;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import dev.alexhstone.config.ApplicationConfiguration;
 import dev.alexhstone.model.queue.WorkItem;
-import dev.alexhstone.model.queue.WorkItemSerializerAndDeserializer;
+import dev.alexhstone.model.queue.WorkItemDeserializer;
+import dev.alexhstone.model.queue.WorkItemSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -32,9 +31,10 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
     private static final long WITH_TWO_SECOND_TIMEOUT = Duration.ofSeconds(2).toMillis();
 
     private final String brokerURL;
-    private final Gson gson;
     private final ActiveMQConnectionFactory connectionFactory;
     private final String queueName;
+    private final WorkItemDeserializer deserializer = new WorkItemDeserializer();
+    private final WorkItemSerializer serializer = new WorkItemSerializer();
 
     private Session session;
     private Connection connection;
@@ -61,11 +61,6 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
     public DurableQueueImpl() {
         this.brokerURL = ApplicationConfiguration.getActiveMQBrokerURL();
         this.queueName = ApplicationConfiguration.getActiveMQQueueName();
-        this.gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .registerTypeAdapter(WorkItem.class,
-                        new WorkItemSerializerAndDeserializer())
-                .create();
         this.connectionFactory = new ActiveMQConnectionFactory(brokerURL);
     }
 
@@ -104,7 +99,7 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
     }
 
     public Status publish(WorkItem workItem) {
-        String workItemAsJson = gson.toJson(workItem);
+        String workItemAsJson = serializer.toJson(workItem);
         return publish(workItem.getId(), workItemAsJson);
     }
 
@@ -139,7 +134,7 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
 
             if (message instanceof TextMessage textMessage) {
                 String messageText = textMessage.getText();
-                WorkItem workItem = gson.fromJson(messageText, WorkItem.class);
+                WorkItem workItem = deserializer.fromJson(messageText);
                 log.debug("Successfully dequeued the work item with ID [{}]", workItem.getId());
                 return Optional.of(workItem);
             }

@@ -3,9 +3,10 @@ package dev.alexhstone.validation;
 import dev.alexhstone.exception.InvalidPathException;
 
 import java.io.File;
-import java.nio.file.Paths;
 
 public class FileValidator {
+
+    private final PathValidator pathValidator = new PathValidator();
 
     public File validateExists(File file) {
         if (!file.exists()) {
@@ -28,7 +29,7 @@ public class FileValidator {
     }
 
     public File validateExists(String absolutePathToFile) {
-        File file = Paths.get(absolutePathToFile).toFile();
+        File file = pathValidator.validateExists(absolutePathToFile).toFile();
         return validateExists(file);
     }
 }

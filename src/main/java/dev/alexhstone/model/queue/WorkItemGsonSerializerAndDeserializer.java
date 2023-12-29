@@ -11,7 +11,7 @@ import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
 import java.time.Instant;
 
-public class WorkItemSerializerAndDeserializer implements JsonSerializer<WorkItem>, JsonDeserializer<WorkItem> {
+class WorkItemGsonSerializerAndDeserializer implements JsonSerializer<WorkItem>, JsonDeserializer<WorkItem> {
 
     @Override
     public JsonElement serialize(WorkItem workItem,
@@ -40,7 +40,7 @@ public class WorkItemSerializerAndDeserializer implements JsonSerializer<WorkIte
                 .absolutePath(jsonObject.get("absolutePath").getAsString())
                 .absolutePathToWorkingDirectory(jsonObject.get("absolutePathToWorkingDirectory").getAsString())
                 .sizeInBytes(jsonObject.get("sizeInBytes").getAsBigInteger())
-                .workItemCreationTime(Instant.ofEpochSecond(jsonObject.get("workItemCreationTime").getAsLong()))
+                .workItemCreationTime(Instant.ofEpochMilli(jsonObject.get("workItemCreationTime").getAsLong()))
                 .build();
 
         return workItem;
