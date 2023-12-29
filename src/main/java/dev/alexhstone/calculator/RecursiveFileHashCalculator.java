@@ -1,6 +1,6 @@
 package dev.alexhstone.calculator;
 
-import dev.alexhstone.model.FileHashResult;
+import dev.alexhstone.model.datastore.WorkItemHashResult;
 import dev.alexhstone.util.PathWalker;
 import dev.alexhstone.validation.DirectoryValidator;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class RecursiveFileHashCalculator {
         directoryValidator = new DirectoryValidator();
     }
 
-    public void process(Path workingDirectory, Consumer<FileHashResult> consumer) {
+    public void process(Path workingDirectory, Consumer<WorkItemHashResult> consumer) {
         Path validPath = directoryValidator.validateExists(workingDirectory);
 
         PathWalker pathWalker = new PathWalker(workingDirectory);
@@ -46,7 +46,7 @@ public class RecursiveFileHashCalculator {
                     }
                 })
                 .forEach(file -> {
-                    FileHashResult hashResult =
+                    WorkItemHashResult hashResult =
                             fileHashResultCalculator.process(validPath, file);
                     consumer.accept(hashResult);
                 });

@@ -3,9 +3,9 @@ package dev.alexhstone;
 import dev.alexhstone.calculator.DiffResultsCalculator;
 import dev.alexhstone.calculator.Location;
 import dev.alexhstone.calculator.RecursiveFileHashCalculator;
+import dev.alexhstone.datastore.WorkItemHashResultRepository;
 import dev.alexhstone.model.DiffResults;
 import dev.alexhstone.model.HashDiffResults;
-import dev.alexhstone.storage.FileHashResultRepository;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;
@@ -19,7 +19,7 @@ public class CompareDirectories {
     private final String rightAbsolutePath;
     private final RecursiveFileHashCalculator recursiveFileHashCalculator;
     private final PersistAsJsonToFile persistAsJSONToFile;
-    private final FileHashResultRepository fileHashResultRepository;
+    private final WorkItemHashResultRepository workItemHashResultRepository;
 
     public CompareDirectories(String leftAbsolutePath,
                               String rightAbsolutePath,
@@ -28,7 +28,7 @@ public class CompareDirectories {
         this.leftAbsolutePath = leftAbsolutePath;
         this.rightAbsolutePath = rightAbsolutePath;
         this.persistAsJSONToFile = new PersistAsJsonToFile(Paths.get(reportDirectoryAbsolutePath));
-        this.fileHashResultRepository = new FileHashResultRepository();
+        this.workItemHashResultRepository = new WorkItemHashResultRepository();
         this.recursiveFileHashCalculator = new RecursiveFileHashCalculator();
     }
 
@@ -49,8 +49,8 @@ public class CompareDirectories {
 
         DiffResultsCalculator diffResultsCalculator = new DiffResultsCalculator();
         HashDiffResults hashDiffResults = null;
-        //diffResultsCalculator.compareResults(fileHashResultRepository.getLeftKeys(),
-          //      fileHashResultRepository.getRightKeys());
+        //diffResultsCalculator.compareResults(workItemHashResultRepository.getLeftKeys(),
+          //      workItemHashResultRepository.getRightKeys());
         // TODO create deserialise and read logic
         persistAsJSONToFile.persist(hashDiffResults, "diffResults.json");
 
@@ -64,7 +64,7 @@ public class CompareDirectories {
 
         log.info("About to calculate hashes for the working directory [{}]", absolutePath);
         recursiveFileHashCalculator.process(workingDirectory,
-                fileHashResult -> fileHashResultRepository.put(fileHashResult));
+                fileHashResult -> workItemHashResultRepository.put(fileHashResult));
         log.info("Completed calculating the hashes for the working directory [{}]", absolutePath);
     }
 

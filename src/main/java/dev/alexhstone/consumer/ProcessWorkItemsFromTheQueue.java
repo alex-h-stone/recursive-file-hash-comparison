@@ -2,10 +2,10 @@ package dev.alexhstone.consumer;
 
 import dev.alexhstone.calculator.FileHashResultCalculator;
 import dev.alexhstone.calculator.HashDetailsCalculator;
-import dev.alexhstone.model.queue.FileWorkItem;
+import dev.alexhstone.datastore.WorkItemHashResultRepository;
+import dev.alexhstone.model.queue.WorkItem;
 import dev.alexhstone.queue.DurableQueueImpl;
 import dev.alexhstone.queue.QueueConsumer;
-import dev.alexhstone.storage.FileHashResultRepository;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ProcessWorkItemsFromTheQueue {
 
     private final QueueConsumer queueConsumer;
-    private final FileHashResultRepository fileHashResultRepository;
+    private final WorkItemHashResultRepository workItemHashResultRepository;
     private final FileHashResultCalculator fileHashResultCalculator;
 
     public static void main(String[] args) {
@@ -26,7 +26,7 @@ public class ProcessWorkItemsFromTheQueue {
 
     public ProcessWorkItemsFromTheQueue(QueueConsumer queueConsumer) {
         this.queueConsumer = queueConsumer;
-        fileHashResultRepository = new FileHashResultRepository();
+        workItemHashResultRepository = new WorkItemHashResultRepository();
         fileHashResultCalculator = new FileHashResultCalculator(new HashDetailsCalculator());
     }
 
@@ -35,24 +35,24 @@ public class ProcessWorkItemsFromTheQueue {
         log.info("About to process work items from the queue");
         AtomicInteger numberOfContinuousUnsuccessfulDequeues = new AtomicInteger(0);
         do {
-            Optional<FileWorkItem> fileWorkItemOptional = queueConsumer.consumeMessage();
+            Optional<WorkItem> fileWorkItemOptional = queueConsumer.consumeMessage();
             if (fileWorkItemOptional.isPresent()) {
 
-                FileWorkItem fileWorkItem = fileWorkItemOptional.get();
-                log.info("About to process the work item with ID: [{}]", fileWorkItem.getId());
+                WorkItem workItem = fileWorkItemOptional.get();
+                log.info("About to process the work item with ID: [{}]", workItem.getId());
                 numberOfContinuousUnsuccessfulDequeues.set(0);
 
                 // TODO add logic to use last modified date/time and size to save recalculating hashes?
-                /*if (!fileHashResultRepository.isAlreadyPresent(fileWorkItem)) {
+                /*if (!workItemHashResultRepository.isAlreadyPresent(workItem)) {
                     log.info("Not already present in cache so processing");
-                    Path workingDirectory = new DirectoryValidator().validateExists(fileWorkItem.getAbsolutePathToWorkingDirectory());
-                    File file = new FileValidator().validateExists(fileWorkItem.getAbsolutePath());
-                    FileHashResult hashResult = fileHashResultCalculator.process(workingDirectory, file);
-                    fileHashResultRepository.put(hashResult);
+                    Path workingDirectory = new DirectoryValidator().validateExists(workItem.getAbsolutePathToWorkingDirectory());
+                    File file = new FileValidator().validateExists(workItem.getAbsolutePath());
+                    WorkItemHashResult hashResult = fileHashResultCalculator.process(workingDirectory, file);
+                    workItemHashResultRepository.put(hashResult);
                 } else {
                     log.info("Work item already present in cache so NOT processing");
                 }*/
-                log.info("Completed processing the work item with ID: [{}]", fileWorkItem.getId());
+                log.info("Completed processing the work item with ID: [{}]", workItem.getId());
             } else {
                 numberOfContinuousUnsuccessfulDequeues.incrementAndGet();
             }

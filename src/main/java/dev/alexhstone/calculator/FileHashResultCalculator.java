@@ -1,7 +1,7 @@
 package dev.alexhstone.calculator;
 
-import dev.alexhstone.model.FileHashResult;
 import dev.alexhstone.model.HashDetails;
+import dev.alexhstone.model.datastore.WorkItemHashResult;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 
@@ -15,7 +15,7 @@ public class FileHashResultCalculator {
 
     private final HashDetailsCalculator hashDetailsCalculator;
 
-    public FileHashResult process(Path workingDirectory, File file) {
+    public WorkItemHashResult process(Path workingDirectory, File file) {
         HashDetails hashDetails = hashDetailsCalculator.calculateHashDetails(file);
 
         BigInteger sizeOfFileInBytes = FileUtils.sizeOfAsBigInteger(file);
@@ -24,14 +24,14 @@ public class FileHashResultCalculator {
         Path relativePath = workingDirectory.relativize(file.toPath().getParent());
 
         String absolutePathToFile = file.getAbsolutePath();
-        return FileHashResult.builder()
+        return WorkItemHashResult.builder()
                 .id(absolutePathToFile)
-                .fileName(file.getName())
-                .relativePathToFile(relativePath.toString())
-                .absolutePathToFile(absolutePathToFile)
+                .name(file.getName())
+                .relativePath(relativePath.toString())
+                .absolutePath(absolutePathToFile)
                 .absolutePathToWorkingDirectory(workingDirectory.toFile().getAbsolutePath())
-                .fileSizeInBytes(sizeOfFileInBytes)
-                .fileSize(byteCountToDisplaySize)
+                .sizeInBytes(sizeOfFileInBytes)
+                .size(byteCountToDisplaySize)
                 .creationTime(Instant.now())
                 .hashDetails(hashDetails)
                 .build();

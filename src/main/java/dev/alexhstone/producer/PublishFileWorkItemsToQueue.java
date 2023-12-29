@@ -1,6 +1,6 @@
 package dev.alexhstone.producer;
 
-import dev.alexhstone.model.queue.FileWorkItem;
+import dev.alexhstone.model.queue.WorkItem;
 import dev.alexhstone.queue.DurableQueueImpl;
 import dev.alexhstone.queue.QueuePublisher;
 import dev.alexhstone.util.PathWalker;
@@ -56,15 +56,15 @@ public class PublishFileWorkItemsToQueue {
         queue.destroy();
     }
 
-    private Consumer<FileWorkItem> publishToQueue() {
+    private Consumer<WorkItem> publishToQueue() {
         return workItem -> {
-            log.debug("About to add FileWorkItem to the queue: {}", workItem);
+            log.debug("About to add WorkItem to the queue: {}", workItem);
             queue.publish(workItem);
         };
     }
 
-    private Stream<FileWorkItem> toStreamOfFileWorkItems(Path workingDirectory) {
-        Function<File, FileWorkItem> toFileWorkItemMapper = new FileToFileWorkItemMapper()
+    private Stream<WorkItem> toStreamOfFileWorkItems(Path workingDirectory) {
+        Function<File, WorkItem> toFileWorkItemMapper = new FileToWorkItemMapper()
                 .asFunction(workingDirectory);
         PathWalker pathWalker = new PathWalker(workingDirectory);
 

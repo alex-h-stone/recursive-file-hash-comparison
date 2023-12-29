@@ -3,8 +3,8 @@ package dev.alexhstone.queue;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.alexhstone.config.ApplicationConfiguration;
-import dev.alexhstone.model.FileWorkItemSerializerAndDeserializer;
-import dev.alexhstone.model.queue.FileWorkItem;
+import dev.alexhstone.model.queue.WorkItem;
+import dev.alexhstone.model.queue.WorkItemSerializerAndDeserializer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -45,14 +45,15 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
         DurableQueueImpl queue = new DurableQueueImpl();
         queue.initialise();
         String absolutePath = Paths.get(".").toFile().getAbsolutePath();
-        queue.publish(FileWorkItem.builder()
+        queue.publish(WorkItem.builder()
                 .id("WorkItem_ID")
+                .name("workItemName.dat")
                 .absolutePath(absolutePath)
                 .absolutePathToWorkingDirectory(absolutePath)
-                .sizeInBytes(BigInteger.valueOf(2000))
+                .sizeInBytes(BigInteger.valueOf(250))
                 .workItemCreationTime(Instant.now())
                 .build());
-        Optional<FileWorkItem> workItem = queue.consumeMessage();
+        Optional<WorkItem> workItem = queue.consumeMessage();
         log.info("Consumed workItem: {}", workItem);
         queue.destroy();
     }
@@ -62,8 +63,8 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
         this.queueName = ApplicationConfiguration.getActiveMQQueueName();
         this.gson = new GsonBuilder()
                 .setPrettyPrinting()
-                .registerTypeAdapter(FileWorkItem.class,
-                        new FileWorkItemSerializerAndDeserializer())
+                .registerTypeAdapter(WorkItem.class,
+                        new WorkItemSerializerAndDeserializer())
                 .create();
         this.connectionFactory = new ActiveMQConnectionFactory(brokerURL);
     }
@@ -102,9 +103,9 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
         return Status.SUCCESS;
     }
 
-    public Status publish(FileWorkItem fileWorkItem) {
-        String workItemAsJson = gson.toJson(fileWorkItem);
-        return publish(fileWorkItem.getId(), workItemAsJson);
+    public Status publish(WorkItem workItem) {
+        String workItemAsJson = gson.toJson(workItem);
+        return publish(workItem.getId(), workItemAsJson);
     }
 
     private Status publish(String id, String messageText) {
@@ -128,7 +129,7 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
         return Status.SUCCESS;
     }
 
-    public Optional<FileWorkItem> consumeMessage() {
+    public Optional<WorkItem> consumeMessage() {
         try {
             Message message = consumer.receive(WITH_TWO_SECOND_TIMEOUT);
             if (message == null) {
@@ -138,9 +139,9 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
 
             if (message instanceof TextMessage textMessage) {
                 String messageText = textMessage.getText();
-                FileWorkItem fileWorkItem = gson.fromJson(messageText, FileWorkItem.class);
-                log.debug("Successfully dequeued the work item with ID [{}]", fileWorkItem.getId());
-                return Optional.of(fileWorkItem);
+                WorkItem workItem = gson.fromJson(messageText, WorkItem.class);
+                log.debug("Successfully dequeued the work item with ID [{}]", workItem.getId());
+                return Optional.of(workItem);
             }
             log.error("Unable to cast the Message: [{}] as a TextMessage", message);
         } catch (JMSException e) {
@@ -150,7 +151,6 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
 
         return Optional.empty();
     }
-
 
     public BigInteger getQueueSize() {
         // TODO should we add this, do we need it?
