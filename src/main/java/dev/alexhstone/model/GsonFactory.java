@@ -1,16 +1,20 @@
-package dev.alexhstone.model.datastore;
+package dev.alexhstone.model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dev.alexhstone.model.datastore.HashResultSerializerAndDeserializer;
 import dev.alexhstone.model.queue.WorkItem;
+import dev.alexhstone.model.queue.WorkItemGsonSerializerAndDeserializer;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-class GsonFactory {
+public class GsonFactory {
 
-    static Gson getGsonInstance() {
+    public static Gson getGsonInstance() {
         return new GsonBuilder()
                 .setPrettyPrinting()
+                .registerTypeAdapter(WorkItem.class,
+                        new WorkItemGsonSerializerAndDeserializer())
                 .registerTypeAdapter(WorkItem.class,
                         new HashResultSerializerAndDeserializer())
                 .create();

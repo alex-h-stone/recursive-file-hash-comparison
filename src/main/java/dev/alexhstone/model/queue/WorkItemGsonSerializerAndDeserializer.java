@@ -11,7 +11,7 @@ import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
 import java.time.Instant;
 
-class WorkItemGsonSerializerAndDeserializer implements JsonSerializer<WorkItem>, JsonDeserializer<WorkItem> {
+public class WorkItemGsonSerializerAndDeserializer implements JsonSerializer<WorkItem>, JsonDeserializer<WorkItem> {
 
     @Override
     public JsonElement serialize(WorkItem workItem,

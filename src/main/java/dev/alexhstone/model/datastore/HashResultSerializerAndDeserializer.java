@@ -11,7 +11,7 @@ import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
 import java.time.Instant;
 
-class HashResultSerializerAndDeserializer implements JsonSerializer<HashResult>, JsonDeserializer<HashResult> {
+public class HashResultSerializerAndDeserializer implements JsonSerializer<HashResult>, JsonDeserializer<HashResult> {
 
     @Override
     public JsonElement serialize(HashResult hashResult,

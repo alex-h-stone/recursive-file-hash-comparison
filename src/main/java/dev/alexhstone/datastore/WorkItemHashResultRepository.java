@@ -1,12 +1,12 @@
 package dev.alexhstone.datastore;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import dev.alexhstone.model.datastore.HashResult;
+import dev.alexhstone.model.datastore.HashResultDeserializer;
+import dev.alexhstone.model.datastore.HashResultSerializer;
 import dev.alexhstone.model.queue.WorkItem;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
@@ -16,7 +16,9 @@ import java.util.Optional;
 @Slf4j
 public class WorkItemHashResultRepository {
 
-    private final Gson gson;
+    private final HashResultDeserializer deserializer = new HashResultDeserializer();
+    private final HashResultSerializer serializer = new HashResultSerializer();
+
     private final MongoCollection<Document> collection;
 
     public static void main(String[] args){
@@ -29,7 +31,6 @@ public class WorkItemHashResultRepository {
         MongoDatabase database = mongoClient.getDatabase("myMongoDatabase");
         collection = database.getCollection("fileHashResultsByAbsolutePath");
 
-        this.gson = new GsonBuilder().create();
     }
 
     public void put(HashResult hashResult) {
@@ -37,7 +38,7 @@ public class WorkItemHashResultRepository {
         Optional<HashResult> existingFileHashResult = retrieveHashResultById(id);
 
         if (existingFileHashResult.isEmpty()) {
-            String json = gson.toJson(hashResult);
+            String json = serializer.toJson(hashResult);
             collection.insertOne(new Document(id, json));
         }
 
@@ -62,7 +63,7 @@ public class WorkItemHashResultRepository {
             return Optional.empty();
         }
         String json = existing.toJson();
-        HashResult hashResult = gson.fromJson(json, HashResult.class);
+        HashResult hashResult = deserializer.fromJson(json);
         return Optional.of(hashResult);
     }
 }
