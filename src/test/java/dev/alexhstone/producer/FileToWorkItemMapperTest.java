@@ -14,11 +14,14 @@ import java.io.File;
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class FileToWorkItemMapperTest {
@@ -51,9 +54,12 @@ class FileToWorkItemMapperTest {
         assertAll(
                 "Grouped Assertions for WorkItem",
                 () -> assertNotNull(actualWorkItem),
+                () -> assertThat(actualWorkItem.getId(), containsStrings("sampleFile.dat")),
+                () -> assertThat(actualWorkItem.getName(), equalTo("sampleFile.dat")),
                 () -> assertThat(actualWorkItem.getAbsolutePath(), containsStrings("sampleFile.dat")),
                 () -> assertThat(actualWorkItem.getAbsolutePathToWorkingDirectory(), not(Matchers.isEmptyOrNullString())),
-                () -> assertEquals(BigInteger.ZERO, actualWorkItem.getSizeInBytes())
+                () -> assertThat(actualWorkItem.getSizeInBytes(), equalTo(BigInteger.ZERO)),
+                () -> assertThat(actualWorkItem.getWorkItemCreationTime(), equalTo(WORK_ITEM_CREATION_TIME))
         );
     }
 
@@ -66,10 +72,12 @@ class FileToWorkItemMapperTest {
         assertAll(
                 "Grouped Assertions for WorkItem",
                 () -> assertNotNull(actualWorkItem),
+                () -> assertThat(actualWorkItem.getId(), containsStrings("sampleFile.dat")),
+                () -> assertThat(actualWorkItem.getName(), equalTo("sampleFile.dat")),
                 () -> assertThat(actualWorkItem.getAbsolutePath(), containsStrings("sampleFile.dat")),
                 () -> assertThat(actualWorkItem.getAbsolutePathToWorkingDirectory(), not(Matchers.isEmptyOrNullString())),
-                () -> assertEquals(BigInteger.valueOf(18), actualWorkItem.getSizeInBytes()),
-                () -> assertThat(actualWorkItem.getWorkItemCreationTime(), Matchers.equalTo(WORK_ITEM_CREATION_TIME))
+                () -> assertThat(actualWorkItem.getSizeInBytes(), equalTo(BigInteger.valueOf(18))),
+                () -> assertThat(actualWorkItem.getWorkItemCreationTime(), equalTo(WORK_ITEM_CREATION_TIME))
         );
     }
 
@@ -83,13 +91,13 @@ class FileToWorkItemMapperTest {
         assertAll(
                 "Grouped Assertions for WorkItem",
                 () -> assertNotNull(actualWorkItem),
-                () -> assertThat(actualWorkItem.getId(), containsStrings("directoryOne")),
-                () -> assertThat(actualWorkItem.getName(), CoreMatchers.equalTo("sampleFile.dat")),
-
-                () -> assertThat(actualWorkItem.getAbsolutePath(), containsStrings("sampleFile.dat")),
+                () -> assertThat(actualWorkItem.getId(), containsStrings("directoryOne", "sampleFile.dat")),
+                () -> assertThat(actualWorkItem.getName(), equalTo("sampleFile.dat")),
+                () -> assertThat(actualWorkItem.getAbsolutePath(), containsStrings("directoryOne", "sampleFile.dat")),
                 () -> assertThat(actualWorkItem.getAbsolutePathToWorkingDirectory(), Matchers.containsString("directoryOne")),
-                () -> assertEquals(BigInteger.valueOf(17), actualWorkItem.getSizeInBytes()),
-                () -> assertThat(actualWorkItem.getWorkItemCreationTime(), Matchers.equalTo(WORK_ITEM_CREATION_TIME))
+                () -> assertThat(actualWorkItem.getAbsolutePathToWorkingDirectory(), Matchers.not(Matchers.containsString("sampleFile.dat"))),
+                () -> assertThat(actualWorkItem.getSizeInBytes(), equalTo(BigInteger.valueOf(17))),
+                () -> assertThat(actualWorkItem.getWorkItemCreationTime(), equalTo(WORK_ITEM_CREATION_TIME))
         );
     }
 
@@ -99,18 +107,18 @@ class FileToWorkItemMapperTest {
         Path directoryTwo = new FileSystemUtils(directoryOne).createDirectory("directoryTwo");
 
         WorkItem actualWorkItem = fileToWorkItemMapper.map(directoryOne, directoryTwo.toFile());
+        assertThat("Failed precondition", directoryTwo.toFile().listFiles(), Matchers.arrayWithSize(0));
 
         assertAll(
                 "Grouped Assertions for WorkItem",
                 () -> assertNotNull(actualWorkItem),
-                () -> assertThat(actualWorkItem.getId(), containsStrings("directoryOne")),
-                () -> assertThat(actualWorkItem.getId(), containsStrings("directoryTwo")),
-                () -> assertThat(actualWorkItem.getName(), CoreMatchers.equalTo("directoryTwo")),
-                () -> assertThat(actualWorkItem.getAbsolutePath(), containsStrings("directoryOne")),
-                () -> assertThat(actualWorkItem.getAbsolutePath(), containsStrings("directoryTwo")),
+                () -> assertThat(actualWorkItem.getId(), containsStrings("directoryOne", "directoryTwo")),
+                () -> assertThat(actualWorkItem.getName(), equalTo("directoryTwo")),
+                () -> assertThat(actualWorkItem.getAbsolutePath(), containsStrings("directoryOne", "directoryTwo")),
                 () -> assertThat(actualWorkItem.getAbsolutePathToWorkingDirectory(), Matchers.containsString("directoryOne")),
-                () -> assertEquals(BigInteger.ZERO, actualWorkItem.getSizeInBytes()),
-                () -> assertThat(actualWorkItem.getWorkItemCreationTime(), Matchers.equalTo(WORK_ITEM_CREATION_TIME))
+                () -> assertThat(actualWorkItem.getAbsolutePathToWorkingDirectory(), Matchers.not(Matchers.containsString("directoryTwo"))),
+                () -> assertThat(actualWorkItem.getSizeInBytes(), equalTo(BigInteger.ZERO)),
+                () -> assertThat(actualWorkItem.getWorkItemCreationTime(), equalTo(WORK_ITEM_CREATION_TIME))
         );
     }
 
@@ -121,27 +129,28 @@ class FileToWorkItemMapperTest {
         File fileWithContent = new FileSystemUtils(directoryTwo).createFileWithContent("sampleFile.dat", "New file contents");
 
         assertNotNull(fileWithContent, "Failed precondition");
-        assertThat(directoryTwo.toFile().listFiles(), Matchers.arrayWithSize(1));
+        assertThat("Failed precondition", directoryTwo.toFile().listFiles(), Matchers.arrayWithSize(1));
 
         WorkItem actualWorkItem = fileToWorkItemMapper.map(directoryOne, directoryTwo.toFile());
 
         assertAll(
                 "Grouped Assertions for WorkItem",
                 () -> assertNotNull(actualWorkItem),
-                () -> assertThat(actualWorkItem.getId(), containsStrings("directoryOne")),
-                () -> assertThat(actualWorkItem.getId(), containsStrings("directoryTwo")),
-                () -> assertThat(actualWorkItem.getName(), CoreMatchers.equalTo("directoryTwo")),
-                () -> assertThat(actualWorkItem.getAbsolutePath(), containsStrings("directoryOne")),
-                () -> assertThat(actualWorkItem.getAbsolutePath(), containsStrings("directoryTwo")),
+                () -> assertThat(actualWorkItem.getId(), containsStrings("directoryOne", "directoryTwo")),
+                () -> assertThat(actualWorkItem.getName(), equalTo("directoryTwo")),
+                () -> assertThat(actualWorkItem.getAbsolutePath(), containsStrings("directoryOne", "directoryTwo")),
                 () -> assertThat(actualWorkItem.getAbsolutePathToWorkingDirectory(), Matchers.containsString("directoryOne")),
                 () -> assertThat(actualWorkItem.getAbsolutePathToWorkingDirectory(), Matchers.not(Matchers.containsString("directoryTwo"))),
-                () -> assertEquals(BigInteger.valueOf(17), actualWorkItem.getSizeInBytes()),
-                () -> assertThat(actualWorkItem.getWorkItemCreationTime(), Matchers.equalTo(WORK_ITEM_CREATION_TIME))
+                () -> assertThat(actualWorkItem.getSizeInBytes(), equalTo(BigInteger.valueOf(17))),
+                () -> assertThat(actualWorkItem.getWorkItemCreationTime(), equalTo(WORK_ITEM_CREATION_TIME))
         );
     }
 
-    private static Matcher<String> containsStrings(String substringOne) {
-        return Matchers.allOf(CoreMatchers.containsString(substringOne),
-                CoreMatchers.containsString(substringOne));
+    private Matcher<String> containsStrings(String... substrings) {
+        List<Matcher<? super String>> containsEachString = Arrays.stream(substrings)
+                .map(CoreMatchers::containsString)
+                .collect(Collectors.toList());
+
+        return Matchers.allOf(containsEachString);
     }
 }
