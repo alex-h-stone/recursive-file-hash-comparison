@@ -1,7 +1,6 @@
 package dev.alexhstone.calculator;
 
 import dev.alexhstone.consumer.HashCalculator;
-import dev.alexhstone.exception.InvalidFileException;
 import dev.alexhstone.test.util.FileSystemUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.CoreMatchers;
@@ -23,7 +22,6 @@ import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HashCalculatorTest {
@@ -84,15 +82,13 @@ class HashCalculatorTest {
     }
 
     @Test
-    void shouldThrowExceptionIfFileIsADirectory() {
+    void shouldNotCalculateHashIfFileIsADirectory() {
         File file = temporaryDirectory.toFile();
         assertTrue(file.isDirectory(), "Failed precondition");
 
-        InvalidFileException expectedException = assertThrows(InvalidFileException.class, () -> hashCalculator.calculateHashFor(file));
-        String actualExceptionMessage = expectedException.getMessage();
+        String actualHash = hashCalculator.calculateHashFor(file);
 
-        assertThat(actualExceptionMessage, CoreMatchers.containsString("Expected ["));
-        assertThat(actualExceptionMessage, CoreMatchers.containsString("] to be a file, but was actually a directory"));
+        assertEquals("[Cannot calculate hash for a directory]", actualHash);
     }
 
     @Test

@@ -95,6 +95,6 @@ class DirectoryValidatorTest {
         InvalidPathException expectedException = assertThrows(InvalidPathException.class,
                 () -> directoryValidator.validateExists(invalidPathToFolderString));
 
-        assertThat(expectedException.getMessage(), Matchers.containsString("The path does not exist"));
+        assertThat(expectedException.getMessage(), Matchers.containsString("The path [Invalid path to folder] does not exist"));
     }
 }
