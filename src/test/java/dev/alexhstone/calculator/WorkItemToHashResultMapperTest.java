@@ -126,6 +126,30 @@ class WorkItemToHashResultMapperTest {
 
     @Test
     void shouldCreateFullyPopulatedFileHashResultForNonEmptyDirectory() {
+        Path childDirectory = fileSystemUtils.createDirectory("childDirectory");
+        new FileSystemUtils(childDirectory).createFileWithContent("someFile.dat", "File contents");
+        File childDirectoryAsFile = childDirectory.toFile();
+
+        assertThat("Failed precondition", childDirectoryAsFile.listFiles(), Matchers.arrayWithSize(1));
+
+        WorkItem workItem = fileToWorkItemMapper.map(temporaryDirectory, childDirectoryAsFile);
+        assertNotNull(workItem, "Failed precondition");
+
+        HashResult actualHashResult = mapper.map(workItem);
+
+        Assertions.assertAll(
+                "Grouped Assertions of HashResult",
+                () -> assertThat(actualHashResult.getId(), containsStrings("childDirectory", temporaryDirectoryAbsolutePath)),
+                () -> assertThat(actualHashResult.getName(), equalTo("childDirectory")),
+                () -> assertThat(actualHashResult.getAbsolutePath(), equalTo(childDirectoryAsFile.getAbsolutePath())),
+                () -> assertThat(actualHashResult.getRelativePath(), equalTo("")),
+                () -> assertThat(actualHashResult.getSizeInBytes(), equalTo(BigInteger.valueOf(13))),
+                () -> assertThat(actualHashResult.getSize(), equalTo("13 bytes")),
+                () -> assertThat(actualHashResult.getWorkItemCreationTime(), equalTo(WORK_ITEM_CREATION_TIME)),
+                () -> assertThat(actualHashResult.getCreationTime(), equalTo(HASH_RESULT_CREATION_TIME)),
+                () -> assertThat(actualHashResult.getHashingAlgorithmName(), equalTo("SHA256")),
+                () -> assertThat(actualHashResult.getHashValue(),
+                        equalTo("[Cannot calculate hash for a directory]")));
     }
 
     @Test
