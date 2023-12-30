@@ -19,6 +19,6 @@ public class HashResult {
     String size;
     Instant workItemCreationTime;
     Instant creationTime;
-    String hashValue;
     String hashingAlgorithmName;
+    String hashValue;
 }

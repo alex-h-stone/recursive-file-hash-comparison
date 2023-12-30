@@ -3,8 +3,9 @@ package dev.alexhstone.calculator;
 import dev.alexhstone.consumer.WorkItemToHashResultMapper;
 import dev.alexhstone.model.datastore.HashResult;
 import dev.alexhstone.model.queue.WorkItem;
+import dev.alexhstone.producer.FileToWorkItemMapper;
 import dev.alexhstone.test.util.FileSystemUtils;
-import org.hamcrest.MatcherAssert;
+import dev.alexhstone.util.Clock;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,39 +15,60 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.math.BigInteger;
 import java.nio.file.Path;
+import java.time.Instant;
+
+import static dev.alexhstone.util.HamcrestUtilities.containsStrings;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 class WorkItemToHashResultMapperTest {
+
+    private static final Instant WORK_ITEM_CREATION_TIME =
+            Instant.parse("2023-12-20T10:15:30Z");
+    private static final Instant HASH_RESULT_CREATION_TIME =
+            Instant.parse("2023-12-20T13:12:57Z");
 
     @TempDir
     private Path temporaryDirectory;
 
     private FileSystemUtils fileSystemUtils;
-    private WorkItemToHashResultMapper hashGenerator;
+    private WorkItemToHashResultMapper mapper;
+    private FileToWorkItemMapper fileToWorkItemMapper;
+    private String temporaryDirectoryAbsolutePath;
 
     @BeforeEach
     void setUp() {
         fileSystemUtils = new FileSystemUtils(temporaryDirectory);
-        hashGenerator = new WorkItemToHashResultMapper();
+        fileToWorkItemMapper = new FileToWorkItemMapper(Clock.stubClockOf(WORK_ITEM_CREATION_TIME));
+        temporaryDirectoryAbsolutePath = temporaryDirectory.toFile().getAbsolutePath();
+
+        mapper = new WorkItemToHashResultMapper(Clock.stubClockOf(HASH_RESULT_CREATION_TIME));
     }
 
     @Test
     void shouldCreateFullyPopulatedFileHashResultForFileThatExists() {
         File existingFile = fileSystemUtils.createFileWithContent("existingFile.txt", "Some test file contents");
 
-        HashResult actualHashResult = hashGenerator.map(createWorkItem());
+        WorkItem workItem = fileToWorkItemMapper.map(temporaryDirectory, existingFile);
+        assertNotNull(workItem, "Failed precondition");
+
+        HashResult actualHashResult = mapper.map(workItem);
 
         Assertions.assertAll(
                 "Grouped Assertions of HashResult",
-                () -> Assertions.assertEquals("existingFile.txt", actualHashResult.getName()),
-                () -> Assertions.assertEquals("", actualHashResult.getRelativePath()),
-                () -> MatcherAssert.assertThat(actualHashResult.getAbsolutePath(), Matchers.containsString("existingFile.txt")),
-                () -> Assertions.assertEquals(BigInteger.valueOf(23), actualHashResult.getSizeInBytes()),
-                () -> Assertions.assertEquals("23 bytes", actualHashResult.getSize()),
-                () -> Assertions.assertEquals("SHA256", actualHashResult.getHashingAlgorithmName()),
-                () -> Assertions.assertEquals("224ff5a028e147b555f07f3e833950acb250baa121c3cc742fc390f5fd5ff9ec",
-                        actualHashResult.getHashValue())
-        );
+                () -> assertThat(actualHashResult.getId(), containsStrings("existingFile.txt", temporaryDirectoryAbsolutePath)),
+                () -> assertThat("existingFile.txt", equalTo(actualHashResult.getName())),
+                () -> assertThat(actualHashResult.getAbsolutePath(), equalTo(existingFile.getAbsolutePath())),
+                () -> assertThat(actualHashResult.getRelativePath(), Matchers.isEmptyString()),
+                () -> assertThat(actualHashResult.getSizeInBytes(), equalTo(BigInteger.valueOf(23))),
+                () -> assertThat(actualHashResult.getSize(), equalTo("23 bytes")),
+                () -> assertThat(actualHashResult.getWorkItemCreationTime(), equalTo(WORK_ITEM_CREATION_TIME)),
+                () -> assertThat(actualHashResult.getCreationTime(), equalTo(HASH_RESULT_CREATION_TIME)),
+                () -> assertThat(actualHashResult.getHashingAlgorithmName(), equalTo("SHA256")),
+                () -> assertThat(actualHashResult.getHashValue(),
+                        equalTo("224ff5a028e147b555f07f3e833950acb250baa121c3cc742fc390f5fd5ff9ec")));
     }
 
     @Test
@@ -56,33 +78,69 @@ class WorkItemToHashResultMapperTest {
 
         File existingFile = new FileSystemUtils(childDirectory).createFileWithContent("existingFile.txt", "Some test file contents");
 
-        HashResult actualHashResult = hashGenerator.map(createWorkItem());
+        WorkItem workItem = fileToWorkItemMapper.map(temporaryDirectory, existingFile);
+        assertNotNull(workItem, "Failed precondition");
+
+       HashResult actualHashResult = mapper.map(workItem);
 
         Assertions.assertAll(
                 "Grouped Assertions of HashResult",
-                () -> Assertions.assertEquals("existingFile.txt", actualHashResult.getName()),
-                () -> Assertions.assertEquals("parentDirectory\\childDirectory", actualHashResult.getRelativePath()),
-                () -> MatcherAssert.assertThat(actualHashResult.getAbsolutePath(), Matchers.containsString("existingFile.txt")),
-                () -> Assertions.assertEquals(BigInteger.valueOf(23), actualHashResult.getSizeInBytes()),
-                () -> Assertions.assertEquals("23 bytes", actualHashResult.getSize()),
-                () -> Assertions.assertEquals("SHA256", actualHashResult.getHashingAlgorithmName()),
-                () -> Assertions.assertEquals("224ff5a028e147b555f07f3e833950acb250baa121c3cc742fc390f5fd5ff9ec",
-                        actualHashResult.getHashValue())
-        );
+                () -> assertThat(actualHashResult.getId(), containsStrings("existingFile.txt", temporaryDirectoryAbsolutePath)),
+                () -> assertThat("existingFile.txt", equalTo(actualHashResult.getName())),
+                () -> assertThat(actualHashResult.getAbsolutePath(), equalTo(existingFile.getAbsolutePath())),
+                () -> assertThat(actualHashResult.getRelativePath(), equalTo("parentDirectory\\childDirectory")),
+                () -> assertThat(actualHashResult.getSizeInBytes(), equalTo(BigInteger.valueOf(23))),
+                () -> assertThat(actualHashResult.getSize(), equalTo("23 bytes")),
+                () -> assertThat(actualHashResult.getWorkItemCreationTime(), equalTo(WORK_ITEM_CREATION_TIME)),
+                () -> assertThat(actualHashResult.getCreationTime(), equalTo(HASH_RESULT_CREATION_TIME)),
+                () -> assertThat(actualHashResult.getHashingAlgorithmName(), equalTo("SHA256")),
+                () -> assertThat(actualHashResult.getHashValue(),
+                        equalTo("224ff5a028e147b555f07f3e833950acb250baa121c3cc742fc390f5fd5ff9ec")));
+
     }
 
     @Test
     void shouldCreateFullyPopulatedFileHashResultForEmptyDirectory() {
+        Path emptyDirectory = fileSystemUtils.createDirectory("emptyDirectory");
+        File emptyDirectoryAsFile = emptyDirectory.toFile();
+
+        WorkItem workItem = fileToWorkItemMapper.map(temporaryDirectory, emptyDirectoryAsFile);
+        assertNotNull(workItem, "Failed precondition");
+
+        HashResult actualHashResult = mapper.map(workItem);
+
+        Assertions.assertAll(
+                "Grouped Assertions of HashResult",
+                () -> assertThat(actualHashResult.getId(), containsStrings("emptyDirectory", temporaryDirectoryAbsolutePath)),
+                () -> assertThat(actualHashResult.getName(), equalTo("emptyDirectory")),
+                () -> assertThat(actualHashResult.getAbsolutePath(), equalTo(emptyDirectoryAsFile.getAbsolutePath())),
+                () -> assertThat(actualHashResult.getRelativePath(), equalTo("")),
+                () -> assertThat(actualHashResult.getSizeInBytes(), equalTo(BigInteger.ZERO)),
+                () -> assertThat(actualHashResult.getSize(), equalTo("0 bytes")),
+                () -> assertThat(actualHashResult.getWorkItemCreationTime(), equalTo(WORK_ITEM_CREATION_TIME)),
+                () -> assertThat(actualHashResult.getCreationTime(), equalTo(HASH_RESULT_CREATION_TIME)),
+                () -> assertThat(actualHashResult.getHashingAlgorithmName(), equalTo("SHA256")),
+                () -> assertThat(actualHashResult.getHashValue(),
+                        equalTo("[Cannot calculate hash for a directory]")));
     }
 
     @Test
     void shouldCreateFullyPopulatedFileHashResultForNonEmptyDirectory() {
     }
 
-    private WorkItem createWorkItem() {
-        return WorkItem.builder()
-                .id("UniqueWorkItemId")
-                .name("")
-                .build();
+    @Test
+    void shouldCreateFullyPopulatedFileHashResultForNowRemovedDirectory() {
+    }
+
+    @Test
+    void shouldCreateFullyPopulatedFileHashResultForNowRemovedFile() {
+    }
+
+    @Test
+    void shouldCreateFullyPopulatedFileHashResultForNowModifiedDirectory() {
+    }
+
+    @Test
+    void shouldCreateFullyPopulatedFileHashResultForNowModifiedFile() {
     }
 }

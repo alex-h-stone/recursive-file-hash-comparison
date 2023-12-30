@@ -4,8 +4,6 @@ import dev.alexhstone.model.queue.WorkItem;
 import dev.alexhstone.test.util.FileSystemUtils;
 import dev.alexhstone.util.Clock;
 import org.apache.commons.lang3.StringUtils;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,10 +13,8 @@ import java.io.File;
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
+import static dev.alexhstone.util.HamcrestUtilities.containsStrings;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
@@ -162,11 +158,4 @@ class FileToWorkItemMapperTest {
         return workItem;
     }
 
-    private Matcher<String> containsStrings(String... substrings) {
-        List<Matcher<? super String>> containsEachString = Arrays.stream(substrings)
-                .map(CoreMatchers::containsString)
-                .collect(Collectors.toList());
-
-        return Matchers.allOf(containsEachString);
-    }
 }

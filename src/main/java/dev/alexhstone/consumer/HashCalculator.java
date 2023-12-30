@@ -1,6 +1,5 @@
 package dev.alexhstone.consumer;
 
-import dev.alexhstone.exception.InvalidFileException;
 import dev.alexhstone.util.HashAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,6 +13,7 @@ import java.security.MessageDigest;
 public class HashCalculator {
 
     private static final HashAlgorithm HASH_ALGORITHM = HashAlgorithm.SHA256;
+    private static final String CANNOT_CALCULATE_HASH_FOR_A_DIRECTORY = "[Cannot calculate hash for a directory]";
 
     public String calculateHashFor(String string) {
         MessageDigest hashAlgorithm = HASH_ALGORITHM.getAlgorithm();
@@ -25,9 +25,9 @@ public class HashCalculator {
 
     public String calculateHashFor(File file) {
         if (file.isDirectory()) {
-            String message = "Expected [%s] to be a file, but was actually a directory"
-                    .formatted(file.getAbsolutePath());
-            throw new InvalidFileException(message);
+            log.debug("Generating empty hash for [{}] as it is a directory and NOT a file",
+                    file.getAbsolutePath());
+            return CANNOT_CALCULATE_HASH_FOR_A_DIRECTORY;
         }
 
         byte[] hashAsBytes = calculateHashOf(file);

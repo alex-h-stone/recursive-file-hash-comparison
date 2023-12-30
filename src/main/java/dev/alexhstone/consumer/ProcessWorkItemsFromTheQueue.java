@@ -5,6 +5,7 @@ import dev.alexhstone.model.datastore.HashResult;
 import dev.alexhstone.model.queue.WorkItem;
 import dev.alexhstone.queue.DurableQueueImpl;
 import dev.alexhstone.queue.QueueConsumer;
+import dev.alexhstone.util.Clock;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
@@ -25,8 +26,8 @@ public class ProcessWorkItemsFromTheQueue {
 
     public ProcessWorkItemsFromTheQueue(QueueConsumer queueConsumer) {
         this.queueConsumer = queueConsumer;
-        repository = new WorkItemHashResultRepository();
-        mapper = new WorkItemToHashResultMapper();
+        this.repository = new WorkItemHashResultRepository();
+        this.mapper = new WorkItemToHashResultMapper(new Clock());
     }
 
     private void execute() {
