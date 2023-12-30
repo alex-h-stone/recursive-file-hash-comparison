@@ -15,5 +15,6 @@ public class WorkItem {
     String absolutePath;
     String absolutePathToWorkingDirectory;
     BigInteger sizeInBytes;
+    Instant itemLastModifiedTime;
     Instant workItemCreationTime;
 }

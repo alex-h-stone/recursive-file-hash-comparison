@@ -11,6 +11,7 @@ import dev.alexhstone.model.queue.WorkItem;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @Slf4j
@@ -23,6 +24,7 @@ public class WorkItemHashResultRepository {
 
     public static void main(String[] args){
         WorkItemHashResultRepository repository = new WorkItemHashResultRepository();
+        // TODO
     }
 
     public WorkItemHashResultRepository() {
@@ -54,7 +56,10 @@ public class WorkItemHashResultRepository {
 
         HashResult existingHashResult = existingHashResultOptional.get();
 
-        return workItem.getSizeInBytes().equals(existingHashResult.getSizeInBytes());
+        Instant itemLastModifiedTime = workItem.getItemLastModifiedTime();
+        return workItem.getSizeInBytes().equals(existingHashResult.getSizeInBytes()) &&
+                itemLastModifiedTime != null &&
+                itemLastModifiedTime.isBefore(existingHashResult.getCreationTime());
     }
 
     private Optional<HashResult> retrieveHashResultById(String id) {

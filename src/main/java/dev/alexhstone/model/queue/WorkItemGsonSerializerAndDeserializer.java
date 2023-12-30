@@ -23,7 +23,8 @@ public class WorkItemGsonSerializerAndDeserializer implements JsonSerializer<Wor
         jsonObject.addProperty("absolutePath", workItem.getAbsolutePath());
         jsonObject.addProperty("absolutePathToWorkingDirectory", workItem.getAbsolutePathToWorkingDirectory());
         jsonObject.addProperty("sizeInBytes", workItem.getSizeInBytes());
-        jsonObject.addProperty("workItemCreationTime", workItem.getWorkItemCreationTime().toEpochMilli());
+        jsonObject.addProperty("itemLastModifiedTime", toNullSafeMilliseconds(workItem.getItemLastModifiedTime()));
+        jsonObject.addProperty("workItemCreationTime", toNullSafeMilliseconds(workItem.getWorkItemCreationTime()));
 
         return jsonObject;
     }
@@ -40,9 +41,26 @@ public class WorkItemGsonSerializerAndDeserializer implements JsonSerializer<Wor
                 .absolutePath(jsonObject.get("absolutePath").getAsString())
                 .absolutePathToWorkingDirectory(jsonObject.get("absolutePathToWorkingDirectory").getAsString())
                 .sizeInBytes(jsonObject.get("sizeInBytes").getAsBigInteger())
-                .workItemCreationTime(Instant.ofEpochMilli(jsonObject.get("workItemCreationTime").getAsLong()))
+                .itemLastModifiedTime(toNullSafeInstant(jsonObject, "itemLastModifiedTime"))
+                .workItemCreationTime(toNullSafeInstant(jsonObject, "workItemCreationTime"))
                 .build();
 
         return workItem;
+    }
+
+    private Long toNullSafeMilliseconds(Instant instant) {
+        if (instant == null) {
+            return null;
+        }
+        return instant.toEpochMilli();
+    }
+
+    private static Instant toNullSafeInstant(JsonObject jsonObject, String fieldName) {
+        JsonElement jsonElement = jsonObject.get(fieldName);
+        if (jsonElement.isJsonNull()) {
+            return null;
+        }
+
+        return Instant.ofEpochMilli(jsonElement.getAsLong());
     }
 }

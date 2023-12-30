@@ -8,8 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
 import java.util.function.Function;
 
 @Slf4j
@@ -33,10 +37,28 @@ public class FileToWorkItemMapper {
                 .absolutePath(fileExists.getAbsolutePath())
                 .absolutePathToWorkingDirectory(validWorkingDirectory.toFile().getAbsolutePath())
                 .sizeInBytes(determineSizeInBytes(file))
+                .itemLastModifiedTime(determineLastModifiedTime(fileExists))
                 .workItemCreationTime(clock.getInstantNow())
                 .build();
         log.debug("Mapped the file [{}] to the workItem: [{}]", fileExists.getAbsolutePath(), workItem);
         return workItem;
+    }
+
+    private Instant determineLastModifiedTime(File fileExists) {
+        if (!fileExists.isFile()) {
+            return null;
+        }
+
+        BasicFileAttributes fileAttributes;
+        try {
+            fileAttributes = Files.readAttributes(fileExists.toPath(), BasicFileAttributes.class);
+        } catch (IOException e) {
+            log.warn("Unable to determine the lastModifiedTime for the file [{}]",
+                    fileExists.getAbsolutePath(), e);
+            return null;
+        }
+
+        return fileAttributes.lastModifiedTime().toInstant();
     }
 
     public Function<File, WorkItem> asFunction(Path workingDirectory) {
