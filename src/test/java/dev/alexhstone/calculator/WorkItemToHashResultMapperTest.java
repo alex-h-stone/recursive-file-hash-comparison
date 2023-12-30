@@ -71,7 +71,18 @@ class WorkItemToHashResultMapperTest {
         );
     }
 
+    @Test
+    void shouldCreateFullyPopulatedFileHashResultForEmptyDirectory() {
+    }
+
+    @Test
+    void shouldCreateFullyPopulatedFileHashResultForNonEmptyDirectory() {
+    }
+
     private WorkItem createWorkItem() {
-        return WorkItem.builder().build();
+        return WorkItem.builder()
+                .id("UniqueWorkItemId")
+                .name("")
+                .build();
     }
 }

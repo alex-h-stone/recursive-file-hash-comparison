@@ -3,6 +3,7 @@ package dev.alexhstone.producer;
 import dev.alexhstone.model.queue.WorkItem;
 import dev.alexhstone.queue.DurableQueueImpl;
 import dev.alexhstone.queue.QueuePublisher;
+import dev.alexhstone.util.Clock;
 import dev.alexhstone.util.PathWalker;
 import dev.alexhstone.validation.DirectoryValidator;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +65,8 @@ public class PublishWorkItemsToQueue {
     }
 
     private Stream<WorkItem> toStreamOfWorkItems(Path workingDirectory) {
-        Function<File, WorkItem> toFileWorkItemMapper = new FileToWorkItemMapper()
+        FileToWorkItemMapper fileToWorkItemMapper = new FileToWorkItemMapper(new Clock());
+        Function<File, WorkItem> toFileWorkItemMapper = fileToWorkItemMapper
                 .asFunction(workingDirectory);
         PathWalker pathWalker = new PathWalker(workingDirectory);
 

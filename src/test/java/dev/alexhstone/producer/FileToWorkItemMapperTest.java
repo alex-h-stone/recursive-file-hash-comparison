@@ -2,6 +2,7 @@ package dev.alexhstone.producer;
 
 import dev.alexhstone.model.queue.WorkItem;
 import dev.alexhstone.test.util.FileSystemUtils;
+import dev.alexhstone.util.Clock;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
@@ -26,7 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class FileToWorkItemMapperTest {
 
-    private static final Instant WORK_ITEM_CREATION_TIME = Instant.parse("2023-12-20T10:15:30Z");
+    private static final Instant WORK_ITEM_CREATION_TIME =
+            Instant.parse("2023-12-20T10:15:30Z");
 
     @TempDir
     private Path temporaryDirectory;
@@ -38,18 +40,19 @@ class FileToWorkItemMapperTest {
     @BeforeEach
     void setUp() {
         fileSystemUtils = new FileSystemUtils(temporaryDirectory);
-        fileToWorkItemMapper = new FileToWorkItemMapper() {
-            Instant getInstantNow() {
+        Clock stubClock = new Clock(){
+            public Instant getInstantNow() {
                 return WORK_ITEM_CREATION_TIME;
             }
         };
+        fileToWorkItemMapper = new FileToWorkItemMapper(stubClock);
     }
 
     @Test
     void shouldMapAllFieldsForEmptyFile() {
         File fileWithContent = fileSystemUtils.createFileWithContent("sampleFile.dat", StringUtils.EMPTY);
 
-        WorkItem actualWorkItem = fileToWorkItemMapper.map(temporaryDirectory, fileWithContent);
+        WorkItem actualWorkItem = applyMapper(temporaryDirectory, fileWithContent);
 
         assertAll(
                 "Grouped Assertions for WorkItem",
@@ -67,7 +70,7 @@ class FileToWorkItemMapperTest {
     void shouldMapAllFieldsForNonEmptyFile() {
         File fileWithContent = fileSystemUtils.createFileWithContent("sampleFile.dat", "Some file contents");
 
-        WorkItem actualWorkItem = fileToWorkItemMapper.map(temporaryDirectory, fileWithContent);
+        WorkItem actualWorkItem = applyMapper(temporaryDirectory, fileWithContent);
 
         assertAll(
                 "Grouped Assertions for WorkItem",
@@ -86,7 +89,7 @@ class FileToWorkItemMapperTest {
         Path directoryOne = fileSystemUtils.createDirectory("directoryOne");
         File fileWithContent = new FileSystemUtils(directoryOne).createFileWithContent("sampleFile.dat", "New file contents");
 
-        WorkItem actualWorkItem = fileToWorkItemMapper.map(directoryOne, fileWithContent);
+        WorkItem actualWorkItem = applyMapper(directoryOne, fileWithContent);
 
         assertAll(
                 "Grouped Assertions for WorkItem",
@@ -106,7 +109,7 @@ class FileToWorkItemMapperTest {
         Path directoryOne = fileSystemUtils.createDirectory("directoryOne");
         Path directoryTwo = new FileSystemUtils(directoryOne).createDirectory("directoryTwo");
 
-        WorkItem actualWorkItem = fileToWorkItemMapper.map(directoryOne, directoryTwo.toFile());
+        WorkItem actualWorkItem = applyMapper(directoryOne, directoryTwo.toFile());
         assertThat("Failed precondition", directoryTwo.toFile().listFiles(), Matchers.arrayWithSize(0));
 
         assertAll(
@@ -131,7 +134,7 @@ class FileToWorkItemMapperTest {
         assertNotNull(fileWithContent, "Failed precondition");
         assertThat("Failed precondition", directoryTwo.toFile().listFiles(), Matchers.arrayWithSize(1));
 
-        WorkItem actualWorkItem = fileToWorkItemMapper.map(directoryOne, directoryTwo.toFile());
+        WorkItem actualWorkItem = applyMapper(directoryOne, directoryTwo.toFile());
 
         assertAll(
                 "Grouped Assertions for WorkItem",
@@ -144,6 +147,19 @@ class FileToWorkItemMapperTest {
                 () -> assertThat(actualWorkItem.getSizeInBytes(), equalTo(BigInteger.valueOf(17))),
                 () -> assertThat(actualWorkItem.getWorkItemCreationTime(), equalTo(WORK_ITEM_CREATION_TIME))
         );
+    }
+
+    private WorkItem applyMapper(Path workingDirectory, File file) {
+        WorkItem workItem = fileToWorkItemMapper.map(workingDirectory, file);
+
+        WorkItem workItemViaFunction = fileToWorkItemMapper
+                .asFunction(workingDirectory)
+                .apply(file);
+
+        assertThat("Expected work items created via different means to be equal",
+                workItem, equalTo(workItemViaFunction));
+
+        return workItem;
     }
 
     private Matcher<String> containsStrings(String... substrings) {
