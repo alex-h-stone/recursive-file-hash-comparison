@@ -154,17 +154,21 @@ class WorkItemToHashResultMapperTest {
 
     @Test
     void shouldCreateFullyPopulatedFileHashResultForNowRemovedDirectory() {
+        // TODO
     }
 
     @Test
     void shouldCreateFullyPopulatedFileHashResultForNowRemovedFile() {
+        // TODO
     }
 
     @Test
     void shouldCreateFullyPopulatedFileHashResultForNowModifiedDirectory() {
+        // TODO
     }
 
     @Test
     void shouldCreateFullyPopulatedFileHashResultForNowModifiedFile() {
+        // TODO
     }
 }

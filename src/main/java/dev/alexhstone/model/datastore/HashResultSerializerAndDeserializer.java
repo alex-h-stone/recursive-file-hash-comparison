@@ -27,8 +27,8 @@ public class HashResultSerializerAndDeserializer implements JsonSerializer<HashR
         jsonObject.addProperty("size", hashResult.getSize());
         jsonObject.addProperty("workItemCreationTime", hashResult.getWorkItemCreationTime().toEpochMilli());
         jsonObject.addProperty("creationTime", hashResult.getCreationTime().toEpochMilli());
-        jsonObject.addProperty("hashValue", hashResult.getHashValue());
         jsonObject.addProperty("hashingAlgorithmName", hashResult.getHashingAlgorithmName());
+        jsonObject.addProperty("hashValue", hashResult.getHashValue());
 
         return jsonObject;
     }
@@ -48,8 +48,9 @@ public class HashResultSerializerAndDeserializer implements JsonSerializer<HashR
                 .sizeInBytes(jsonObject.get("sizeInBytes").getAsBigInteger())
                 .size(jsonObject.get("size").getAsString())
                 .workItemCreationTime(Instant.ofEpochMilli(jsonObject.get("workItemCreationTime").getAsLong()))
-                .creationTime(Instant.ofEpochMilli(jsonObject.get("creationTime").getAsLong()))                .hashValue(jsonObject.get("hashValue").getAsString())
+                .creationTime(Instant.ofEpochMilli(jsonObject.get("creationTime").getAsLong()))
                 .hashingAlgorithmName(jsonObject.get("hashingAlgorithmName").getAsString())
+                .hashValue(jsonObject.get("hashValue").getAsString())
                 .build();
 
         return hashResult;
