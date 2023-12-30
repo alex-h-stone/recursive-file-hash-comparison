@@ -28,17 +28,10 @@ public class FileToWorkItemMapper {
                 .absolutePath(fileExists.getAbsolutePath())
                 .absolutePathToWorkingDirectory(validWorkingDirectory.toFile().getAbsolutePath())
                 .sizeInBytes(determineSizeInBytes(file))
-                .workItemCreationTime(Instant.now())
+                .workItemCreationTime(getInstantNow())
                 .build();
         log.debug("Mapped the file [{}] to the workItem: [{}]", fileExists.getAbsolutePath(), workItem);
         return workItem;
-    }
-
-    private BigInteger determineSizeInBytes(File file) {
-        if (file.isDirectory()) {
-            return FileUtils.sizeOfDirectoryAsBigInteger(file);
-        }
-        return FileUtils.sizeOfAsBigInteger(file);
     }
 
     public Function<File, WorkItem> asFunction(Path workingDirectory) {
@@ -50,5 +43,16 @@ public class FileToWorkItemMapper {
                 return mapper.map(workingDirectory, file);
             }
         };
+    }
+
+    Instant getInstantNow() {
+        return Instant.now();
+    }
+
+    private BigInteger determineSizeInBytes(File file) {
+        if (file.isDirectory()) {
+            return FileUtils.sizeOfDirectoryAsBigInteger(file);
+        }
+        return FileUtils.sizeOfAsBigInteger(file);
     }
 }
