@@ -2,6 +2,7 @@ package dev.alexhstone.model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dev.alexhstone.model.datastore.HashResult;
 import dev.alexhstone.model.datastore.HashResultSerializerAndDeserializer;
 import dev.alexhstone.model.queue.WorkItem;
 import dev.alexhstone.model.queue.WorkItemGsonSerializerAndDeserializer;
@@ -15,7 +16,7 @@ public class GsonFactory {
                 .setPrettyPrinting()
                 .registerTypeAdapter(WorkItem.class,
                         new WorkItemGsonSerializerAndDeserializer())
-                .registerTypeAdapter(WorkItem.class,
+                .registerTypeAdapter(HashResult.class,
                         new HashResultSerializerAndDeserializer())
                 .create();
     }
