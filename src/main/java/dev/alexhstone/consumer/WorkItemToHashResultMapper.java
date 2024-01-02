@@ -20,23 +20,24 @@ public class WorkItemToHashResultMapper {
     private final Clock clock;
 
     public HashResult map(WorkItem workItem) {
-        String absolutePath = workItem.getAbsolutePath();
-        Path validPath = pathValidator.validateExists(absolutePath);
-        File file = new FileValidator().validateExists(validPath.toFile());
+        String absolutePathString = workItem.getAbsolutePath();
+        Path pathToWorkItem = pathValidator.validateExists(absolutePathString);
+        File file = new FileValidator().validateExists(pathToWorkItem.toFile());
         String hashValue = hashCalculator.calculateHashFor(file);
 
         BigInteger sizeOfFileInBytes = FileUtils.sizeOfAsBigInteger(file);
         String byteCountToDisplaySize = FileUtils.byteCountToDisplaySize(sizeOfFileInBytes);
 
-        Path relativePath = pathValidator.validateExists(workItem.getAbsolutePathToWorkingDirectory())
-                .relativize(validPath.getParent());
+        String absolutePathToWorkingDirectoryString = workItem.getAbsolutePathToWorkingDirectory();
+        Path pathToWorkingDirectory = pathValidator.validateExists(absolutePathToWorkingDirectoryString);
+        Path relativePath = pathToWorkingDirectory.relativize(pathToWorkItem.getParent());
 
         return HashResult.builder()
-                .id(absolutePath)
                 .name(workItem.getName())
-                .absolutePath(absolutePath)
-                .absolutePathToWorkingDirectory(workItem.getAbsolutePathToWorkingDirectory())
+                .absolutePath(absolutePathString)
+                .absolutePathToWorkingDirectory(absolutePathToWorkingDirectoryString)
                 .relativePath(relativePath.toString())
+                .relativePathToFile(pathToWorkingDirectory.relativize(pathToWorkItem).toString())
                 .sizeInBytes(sizeOfFileInBytes)
                 .size(byteCountToDisplaySize)
                 .workItemCreationTime(workItem.getWorkItemCreationTime())

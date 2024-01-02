@@ -10,6 +10,7 @@ import com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
 import java.time.Instant;
+import java.util.Objects;
 
 public class WorkItemGsonSerializerAndDeserializer implements JsonSerializer<WorkItem>, JsonDeserializer<WorkItem> {
 
@@ -18,7 +19,6 @@ public class WorkItemGsonSerializerAndDeserializer implements JsonSerializer<Wor
                                  Type type,
                                  JsonSerializationContext context) {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("id", workItem.getId());
         jsonObject.addProperty("name", workItem.getName());
         jsonObject.addProperty("absolutePath", workItem.getAbsolutePath());
         jsonObject.addProperty("absolutePathToWorkingDirectory", workItem.getAbsolutePathToWorkingDirectory());
@@ -36,7 +36,6 @@ public class WorkItemGsonSerializerAndDeserializer implements JsonSerializer<Wor
         JsonObject jsonObject = json.getAsJsonObject();
 
         WorkItem workItem = WorkItem.builder()
-                .id(jsonObject.get("id").getAsString())
                 .name(jsonObject.get("name").getAsString())
                 .absolutePath(jsonObject.get("absolutePath").getAsString())
                 .absolutePathToWorkingDirectory(jsonObject.get("absolutePathToWorkingDirectory").getAsString())
@@ -57,7 +56,7 @@ public class WorkItemGsonSerializerAndDeserializer implements JsonSerializer<Wor
 
     private static Instant toNullSafeInstant(JsonObject jsonObject, String fieldName) {
         JsonElement jsonElement = jsonObject.get(fieldName);
-        if (jsonElement.isJsonNull()) {
+        if (Objects.isNull(jsonElement) || jsonElement.isJsonNull()) {
             return null;
         }
 

@@ -50,7 +50,6 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
         queue.initialise();
         String absolutePath = Paths.get(".").toFile().getAbsolutePath();
         queue.publish(WorkItem.builder()
-                .id("WorkItem_ID")
                 .name("workItemName.dat")
                 .absolutePath(absolutePath)
                 .absolutePathToWorkingDirectory(absolutePath)

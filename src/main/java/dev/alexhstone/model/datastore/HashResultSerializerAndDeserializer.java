@@ -18,11 +18,11 @@ public class HashResultSerializerAndDeserializer implements JsonSerializer<HashR
                                  Type typeOfSrc,
                                  JsonSerializationContext context) {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("id", hashResult.getId());
         jsonObject.addProperty("name", hashResult.getName());
         jsonObject.addProperty("absolutePath", hashResult.getAbsolutePath());
         jsonObject.addProperty("absolutePathToWorkingDirectory", hashResult.getAbsolutePathToWorkingDirectory());
         jsonObject.addProperty("relativePath", hashResult.getRelativePath());
+        jsonObject.addProperty("relativePathToFile", hashResult.getRelativePathToFile());
         jsonObject.addProperty("sizeInBytes", hashResult.getSizeInBytes());
         jsonObject.addProperty("size", hashResult.getSize());
         jsonObject.addProperty("workItemCreationTime", hashResult.getWorkItemCreationTime().toEpochMilli());
@@ -40,11 +40,11 @@ public class HashResultSerializerAndDeserializer implements JsonSerializer<HashR
         JsonObject jsonObject = json.getAsJsonObject();
 
         HashResult hashResult = HashResult.builder()
-                .id(jsonObject.get("id").getAsString())
                 .name(jsonObject.get("name").getAsString())
                 .absolutePath(jsonObject.get("absolutePath").getAsString())
                 .absolutePathToWorkingDirectory(jsonObject.get("absolutePathToWorkingDirectory").getAsString())
                 .relativePath(jsonObject.get("relativePath").getAsString())
+                .relativePathToFile(jsonObject.get("relativePathToFile").getAsString())
                 .sizeInBytes(jsonObject.get("sizeInBytes").getAsBigInteger())
                 .size(jsonObject.get("size").getAsString())
                 .workItemCreationTime(Instant.ofEpochMilli(jsonObject.get("workItemCreationTime").getAsLong()))

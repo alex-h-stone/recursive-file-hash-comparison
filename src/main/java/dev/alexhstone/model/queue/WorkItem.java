@@ -10,11 +10,14 @@ import java.time.Instant;
 @Builder
 public class WorkItem {
 
-    String id;
     String name;
     String absolutePath;
     String absolutePathToWorkingDirectory;
     BigInteger sizeInBytes;
     Instant itemLastModifiedTime;
     Instant workItemCreationTime;
+
+    public String getId(){
+        return absolutePath;
+    }
 }

@@ -10,11 +10,11 @@ import java.time.Instant;
 @Builder
 public class HashResult {
 
-    String id;
     String name;
     String absolutePath;
     String absolutePathToWorkingDirectory;
     String relativePath;
+    String relativePathToFile; // Note: This will be identical to relativePath for directories
     BigInteger sizeInBytes;
     String size;
     Instant workItemCreationTime;

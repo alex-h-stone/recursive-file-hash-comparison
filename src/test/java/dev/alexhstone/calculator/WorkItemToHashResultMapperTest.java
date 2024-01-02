@@ -58,10 +58,11 @@ class WorkItemToHashResultMapperTest {
 
         Assertions.assertAll(
                 "Grouped Assertions of HashResult",
-                () -> assertThat(actualHashResult.getId(), containsStrings("existingFile.txt", temporaryDirectoryAbsolutePath)),
                 () -> assertThat("existingFile.txt", equalTo(actualHashResult.getName())),
                 () -> assertThat(actualHashResult.getAbsolutePath(), equalTo(existingFile.getAbsolutePath())),
+                () -> assertThat(actualHashResult.getAbsolutePathToWorkingDirectory(), containsStrings(workItem.getAbsolutePathToWorkingDirectory())),
                 () -> assertThat(actualHashResult.getRelativePath(), Matchers.isEmptyString()),
+                () -> assertThat(actualHashResult.getRelativePathToFile(), equalTo("existingFile.txt")),
                 () -> assertThat(actualHashResult.getSizeInBytes(), equalTo(BigInteger.valueOf(23))),
                 () -> assertThat(actualHashResult.getSize(), equalTo("23 bytes")),
                 () -> assertThat(actualHashResult.getWorkItemCreationTime(), equalTo(WORK_ITEM_CREATION_TIME)),
@@ -85,10 +86,10 @@ class WorkItemToHashResultMapperTest {
 
         Assertions.assertAll(
                 "Grouped Assertions of HashResult",
-                () -> assertThat(actualHashResult.getId(), containsStrings("existingFile.txt", temporaryDirectoryAbsolutePath)),
                 () -> assertThat("existingFile.txt", equalTo(actualHashResult.getName())),
                 () -> assertThat(actualHashResult.getAbsolutePath(), equalTo(existingFile.getAbsolutePath())),
                 () -> assertThat(actualHashResult.getRelativePath(), equalTo("parentDirectory\\childDirectory")),
+                () -> assertThat(actualHashResult.getRelativePathToFile(), equalTo("parentDirectory\\childDirectory\\existingFile.txt")),
                 () -> assertThat(actualHashResult.getSizeInBytes(), equalTo(BigInteger.valueOf(23))),
                 () -> assertThat(actualHashResult.getSize(), equalTo("23 bytes")),
                 () -> assertThat(actualHashResult.getWorkItemCreationTime(), equalTo(WORK_ITEM_CREATION_TIME)),
@@ -111,10 +112,10 @@ class WorkItemToHashResultMapperTest {
 
         Assertions.assertAll(
                 "Grouped Assertions of HashResult",
-                () -> assertThat(actualHashResult.getId(), containsStrings("emptyDirectory", temporaryDirectoryAbsolutePath)),
                 () -> assertThat(actualHashResult.getName(), equalTo("emptyDirectory")),
                 () -> assertThat(actualHashResult.getAbsolutePath(), equalTo(emptyDirectoryAsFile.getAbsolutePath())),
                 () -> assertThat(actualHashResult.getRelativePath(), equalTo("")),
+                () -> assertThat(actualHashResult.getRelativePathToFile(), equalTo("emptyDirectory")),
                 () -> assertThat(actualHashResult.getSizeInBytes(), equalTo(BigInteger.ZERO)),
                 () -> assertThat(actualHashResult.getSize(), equalTo("0 bytes")),
                 () -> assertThat(actualHashResult.getWorkItemCreationTime(), equalTo(WORK_ITEM_CREATION_TIME)),
@@ -139,10 +140,10 @@ class WorkItemToHashResultMapperTest {
 
         Assertions.assertAll(
                 "Grouped Assertions of HashResult",
-                () -> assertThat(actualHashResult.getId(), containsStrings("childDirectory", temporaryDirectoryAbsolutePath)),
                 () -> assertThat(actualHashResult.getName(), equalTo("childDirectory")),
                 () -> assertThat(actualHashResult.getAbsolutePath(), equalTo(childDirectoryAsFile.getAbsolutePath())),
                 () -> assertThat(actualHashResult.getRelativePath(), equalTo("")),
+                () -> assertThat(actualHashResult.getRelativePathToFile(), equalTo("childDirectory")),
                 () -> assertThat(actualHashResult.getSizeInBytes(), equalTo(BigInteger.valueOf(13))),
                 () -> assertThat(actualHashResult.getSize(), equalTo("13 bytes")),
                 () -> assertThat(actualHashResult.getWorkItemCreationTime(), equalTo(WORK_ITEM_CREATION_TIME)),

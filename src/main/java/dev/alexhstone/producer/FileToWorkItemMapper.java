@@ -32,7 +32,6 @@ public class FileToWorkItemMapper {
         File fileExists = fileValidator.validateExists(file);
 
         WorkItem workItem = WorkItem.builder()
-                .id(fileExists.getAbsolutePath())
                 .name(fileExists.getName())
                 .absolutePath(fileExists.getAbsolutePath())
                 .absolutePathToWorkingDirectory(validWorkingDirectory.toFile().getAbsolutePath())
