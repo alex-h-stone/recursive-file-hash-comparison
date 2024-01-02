@@ -4,6 +4,7 @@ import dev.alexhstone.config.ApplicationConfiguration;
 import dev.alexhstone.model.queue.WorkItem;
 import dev.alexhstone.model.queue.WorkItemDeserializer;
 import dev.alexhstone.model.queue.WorkItemSerializer;
+import dev.alexhstone.util.PrettyPrintNumberFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +23,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
@@ -35,6 +37,8 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
     private final String queueName;
     private final WorkItemDeserializer deserializer = new WorkItemDeserializer();
     private final WorkItemSerializer serializer = new WorkItemSerializer();
+    private final AtomicLong numberOfMessagesConsumed;
+    private final AtomicLong numberOfMessagesPublished;
 
     private Session session;
     private Connection connection;
@@ -62,6 +66,8 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
         this.brokerURL = ApplicationConfiguration.getActiveMQBrokerURL();
         this.queueName = ApplicationConfiguration.getActiveMQQueueName();
         this.connectionFactory = new ActiveMQConnectionFactory(brokerURL);
+        this.numberOfMessagesConsumed = new AtomicLong();
+        this.numberOfMessagesPublished = new AtomicLong();
     }
 
     public void initialise() {
@@ -94,8 +100,15 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
                     e.getMessage(), e);
             return Status.FAILURE;
         }
-
+        log.info("Successfully closed the connection and session to the queue");
+        log.info("Consumed: {} messages", toPrettyPrint(numberOfMessagesConsumed));
+        log.info("Published: {} messages", toPrettyPrint(numberOfMessagesPublished));
         return Status.SUCCESS;
+    }
+
+    private String toPrettyPrint(AtomicLong atomicLongToFormat) {
+        long longNumberToFormat = atomicLongToFormat.get();
+        return PrettyPrintNumberFormatter.format(longNumberToFormat);
     }
 
     public Status publish(WorkItem workItem) {
@@ -121,6 +134,7 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
             return Status.FAILURE;
         }
 
+        numberOfMessagesPublished.incrementAndGet();
         return Status.SUCCESS;
     }
 
@@ -135,6 +149,7 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
             if (message instanceof TextMessage textMessage) {
                 String messageText = textMessage.getText();
                 WorkItem workItem = deserializer.fromJson(messageText);
+                numberOfMessagesConsumed.incrementAndGet();
                 log.debug("Successfully dequeued the work item with ID [{}]", workItem.getId());
                 return Optional.of(workItem);
             }
@@ -145,10 +160,5 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
         }
 
         return Optional.empty();
-    }
-
-    public BigInteger getQueueSize() {
-        // TODO should we add this, do we need it?
-        return BigInteger.ZERO;
     }
 }

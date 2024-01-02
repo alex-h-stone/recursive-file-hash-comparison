@@ -2,5 +2,6 @@ package dev.alexhstone;
 
 public class DetermineIdenticalFiles {
 
-    // TODO make main method to do stuff
+    // TODO later - make main method impl to provide a report on identical files in the same
+    // working directory, identical == same hash
 }
