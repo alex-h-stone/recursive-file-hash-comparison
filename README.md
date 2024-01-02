@@ -24,10 +24,19 @@ work item consumer.
 
 
 #### Work item consumer
+Worker(s) whose responsibility is to consume all available (queued) work items. When consuming a work item a number of meta data is calculated for the given file/directory, including a hash of the file.
+The meta data is then persisted to the datastore for retrieval later.
 
 
-Comparison Report Generator
-Given data stored in the MongoDb - generate comparison reports
+#### Comparison Report Generator
+Given two working directories with their associated absolute paths, generate a report highlighting any file and directory differences between them.
+
+#### Identify duplicated files
+Identify exactly by file hash and file size.
+Consider fuzzy identification by matching filenames and/or file size.
+
+#### TODO
+Consider 
 
 
 ### Requirements
