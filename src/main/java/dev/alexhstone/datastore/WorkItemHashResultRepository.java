@@ -1,6 +1,5 @@
 package dev.alexhstone.datastore;
 
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -29,9 +28,7 @@ public class WorkItemHashResultRepository {
 
     public static void main(String[] args) {
         WorkItemHashResultRepository repository = new WorkItemHashResultRepository();
-        Optional<HashResult> hashResult = repository.retrieveHashResultByAbsolutePath("659458a23cda4d36f5fcfe31");
-        int h = 5;
-        // TODO
+        Optional<HashResult> hashResult = repository.retrieveHashResultByAbsolutePath("F:\\Data\\Audio\\A\\AC DC\\AC DC - Let There Be Rock\\05 AC DC - Problem Child.mp3");
     }
 
     public WorkItemHashResultRepository() {
@@ -40,7 +37,8 @@ public class WorkItemHashResultRepository {
         MongoDatabase database = mongoClient.getDatabase("FileSystemHashCache");
         collection = database.getCollection("hashResults");
 
-        collection.createIndex(Indexes.hashed("id"));
+        collection.createIndex(Indexes.hashed("absolutePath"));
+        collection.createIndex(Indexes.hashed("relativePathToFile"));
         collection.createIndex(Indexes.hashed("hashValue"));
     }
 
@@ -49,8 +47,9 @@ public class WorkItemHashResultRepository {
 
         if (existingFileHashResult.isEmpty()) {
             String json = serializer.toJson(hashResult);
-            Document document = new Document("absolutePath", hashResult.getAbsolutePath());
-            document.append("hashResultJSON", json)
+            Document document = new Document("hashResultJSON", json);
+            document.append("absolutePath", hashResult.getAbsolutePath())
+                    .append("relativePathToFile", hashResult.getRelativePathToFile())
                     .append("hashValue", hashResult.getHashValue());
             collection.insertOne(document);
         }
@@ -74,16 +73,24 @@ public class WorkItemHashResultRepository {
     }
 
     private Optional<HashResult> retrieveHashResultByAbsolutePath(String absolutePath) {
-        FindIterable<Document> matchingDocuments = collection.find(Filters.eq("absolutePath", absolutePath));
-        List<? super Document> bsonDocuments = new ArrayList<>();
-        matchingDocuments.into(bsonDocuments);
+        List<Document> matchingDocuments = new ArrayList<>();
+        collection.find(Filters.eq("absolutePath", absolutePath))
+                .into(matchingDocuments);
 
-        Document existing = matchingDocuments.first();
-        if (existing == null || existing.isEmpty()) {
+        int numberOfMatchingDocuments = matchingDocuments.size();
+        if (numberOfMatchingDocuments > 1) {
+            log.warn("Found multiple ({}) Documents with the absolutePath [{}], the absolutePath should be a unique Id",
+                    numberOfMatchingDocuments, absolutePath);
+        }
+
+        if (numberOfMatchingDocuments == 0) {
             return Optional.empty();
         }
-        String json = existing.toJson();
-        HashResult hashResult = deserializer.fromJson(json);
+
+        Document matchingDocument = matchingDocuments.get(0);
+
+        String hashResultJson = matchingDocument.getString("hashResultJSON");
+        HashResult hashResult = deserializer.fromJson(hashResultJson);
         return Optional.of(hashResult);
     }
 }
