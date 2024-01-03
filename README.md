@@ -36,7 +36,15 @@ Identify exactly by file hash and file size.
 Consider fuzzy identification by matching filenames and/or file size.
 
 #### TODO
-Consider 
+Consider
+Run all dependencies in Docker networked containers (self contained no reliance on the client machine to install services)
+Create background periodic services to update hashes etc. on new and changed files.
+GUI to see stuff and manage working directories, reset queues and Mongo DB.
+Background cleanup job to remove hash results from old deleted files.
+MongoDB collection to store any serious error conditions.
+How to manage a graceful shutdown of workers, or termination conditions.
+
+
 
 
 ### Requirements
