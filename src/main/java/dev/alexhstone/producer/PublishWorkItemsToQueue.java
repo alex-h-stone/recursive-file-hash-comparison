@@ -3,6 +3,7 @@ package dev.alexhstone.producer;
 import dev.alexhstone.model.queue.WorkItem;
 import dev.alexhstone.queue.DurableQueueImpl;
 import dev.alexhstone.queue.QueuePublisher;
+import dev.alexhstone.queue.Status;
 import dev.alexhstone.util.Clock;
 import dev.alexhstone.util.PathWalker;
 import dev.alexhstone.validation.DirectoryValidator;
@@ -60,7 +61,12 @@ public class PublishWorkItemsToQueue {
     private Consumer<WorkItem> publishToQueue() {
         return workItem -> {
             log.debug("About to add WorkItem to the queue: {}", workItem);
-            queue.publish(workItem);
+            Status publishStatus = queue.publish(workItem);
+            if(Status.SUCCESS.equals(publishStatus)){
+                log.debug("Successfully published the message (work item) [{}]", workItem);
+            } else {
+                log.warn("Failed to publish the message (work item) [{}]", workItem);
+            }
         };
     }
 

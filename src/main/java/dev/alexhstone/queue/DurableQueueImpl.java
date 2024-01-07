@@ -57,7 +57,7 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
                 .workItemCreationTime(Instant.now())
                 .build());
         Optional<WorkItem> workItem = queue.consumeMessage();
-        log.info("Consumed workItem: {}", workItem);
+        log.debug("Consumed workItem: {}", workItem);
         queue.destroy();
     }
 
@@ -141,7 +141,7 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
         try {
             Message message = consumer.receive(WITH_TWO_SECOND_TIMEOUT);
             if (message == null) {
-                log.info("Received null message, so returning empty");
+                log.debug("Received null message, so returning empty");
                 return Optional.empty();
             }
 

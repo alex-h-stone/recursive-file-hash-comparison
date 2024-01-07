@@ -19,13 +19,12 @@ public class ProcessWorkItemsFromTheQueue {
     private final WorkItemToHashResultMapper mapper;
 
     public static void main(String[] args) {
-        DurableQueueImpl queue = new DurableQueueImpl();
-        ProcessWorkItemsFromTheQueue processWorkItemsFromTheQueue = new ProcessWorkItemsFromTheQueue(queue);
+        ProcessWorkItemsFromTheQueue processWorkItemsFromTheQueue = new ProcessWorkItemsFromTheQueue();
         processWorkItemsFromTheQueue.execute();
     }
 
-    public ProcessWorkItemsFromTheQueue(QueueConsumer queueConsumer) {
-        this.queueConsumer = queueConsumer;
+    public ProcessWorkItemsFromTheQueue() {
+        this.queueConsumer = new DurableQueueImpl();
         this.repository = new WorkItemHashResultRepository();
         this.mapper = new WorkItemToHashResultMapper(new Clock());
     }
@@ -39,18 +38,18 @@ public class ProcessWorkItemsFromTheQueue {
             if (fileWorkItemOptional.isPresent()) {
 
                 WorkItem workItem = fileWorkItemOptional.get();
-                log.info("About to process the work item with ID: [{}]", workItem.getId());
+                log.debug("About to process the work item with ID: [{}]", workItem.getId());
                 numberOfContinuousUnsuccessfulDequeues.set(0);
 
                 if (repository.hasAlreadyBeenCalculated(workItem)) {
-                    log.debug("Work item with ID [{}] has already been calculated so NOT processing",
+                    log.info("Work item with ID [{}] has already been calculated so NOT processing",
                             workItem.getId());
                     continue;
                 }
 
                 HashResult hashResult = mapper.map(workItem);
                 repository.put(hashResult);
-                log.info("Completed processing the work item with ID: [{}]", workItem.getId());
+                log.debug("Completed processing the work item with ID: [{}]", workItem.getId());
             } else {
                 numberOfContinuousUnsuccessfulDequeues.incrementAndGet();
             }
