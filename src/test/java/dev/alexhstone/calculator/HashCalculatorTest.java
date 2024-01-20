@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -93,7 +94,7 @@ class HashCalculatorTest {
 
     @Test
     @Tag("long-running")
-    void shouldNotEncounterThreadingIssuesWhenCalculatingManyHashesForDifferentFiles() {
+    void shouldNotEncounterThreadingIssuesWhenCalculatingManyHashesForDifferentFiles() throws InterruptedException {
         int numberOfThreads = 500;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
 
@@ -120,6 +121,7 @@ class HashCalculatorTest {
         }
 
         executorService.shutdown();
+        executorService.awaitTermination(10, TimeUnit.SECONDS);
     }
 
     @Test

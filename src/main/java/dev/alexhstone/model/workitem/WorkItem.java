@@ -1,4 +1,4 @@
-package dev.alexhstone.model.queue;
+package dev.alexhstone.model.workitem;
 
 import lombok.Builder;
 import lombok.Value;

@@ -1,4 +1,4 @@
-package dev.alexhstone.model.datastore;
+package dev.alexhstone.model.hashresult;
 
 import com.google.gson.Gson;
 import dev.alexhstone.model.GsonFactory;

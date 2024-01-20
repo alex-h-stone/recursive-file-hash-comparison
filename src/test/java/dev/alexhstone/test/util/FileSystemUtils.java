@@ -27,7 +27,6 @@ public class FileSystemUtils {
                     .formatted(fileName, absolutePathOfWorkingDirectory(), content);
             throw new IllegalArgumentException(message, e);
         }
-
         return resolved.toFile();
     }
 

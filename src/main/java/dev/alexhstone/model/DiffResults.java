@@ -1,6 +1,6 @@
 package dev.alexhstone.model;
 
-import dev.alexhstone.model.datastore.HashResult;
+import dev.alexhstone.model.hashresult.HashResult;
 import lombok.Builder;
 import lombok.Value;
 

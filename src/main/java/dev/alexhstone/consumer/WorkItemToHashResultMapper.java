@@ -1,7 +1,8 @@
 package dev.alexhstone.consumer;
 
-import dev.alexhstone.model.datastore.HashResult;
-import dev.alexhstone.model.queue.WorkItem;
+import dev.alexhstone.model.hashresult.FileSystemType;
+import dev.alexhstone.model.hashresult.HashResult;
+import dev.alexhstone.model.workitem.WorkItem;
 import dev.alexhstone.util.Clock;
 import dev.alexhstone.validation.FileValidator;
 import dev.alexhstone.validation.PathValidator;
@@ -38,6 +39,7 @@ public class WorkItemToHashResultMapper {
                 .absolutePathToWorkingDirectory(absolutePathToWorkingDirectoryString)
                 .relativePath(relativePath.toString())
                 .relativePathToFile(pathToWorkingDirectory.relativize(pathToWorkItem).toString())
+                .fileSystemType(FileSystemType.valueOfFile(file))
                 .sizeInBytes(sizeOfFileInBytes)
                 .size(byteCountToDisplaySize)
                 .workItemCreationTime(workItem.getWorkItemCreationTime())

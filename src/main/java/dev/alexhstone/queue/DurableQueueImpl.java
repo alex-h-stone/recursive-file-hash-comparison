@@ -1,9 +1,9 @@
 package dev.alexhstone.queue;
 
 import dev.alexhstone.config.ApplicationConfiguration;
-import dev.alexhstone.model.queue.WorkItem;
-import dev.alexhstone.model.queue.WorkItemDeserializer;
-import dev.alexhstone.model.queue.WorkItemSerializer;
+import dev.alexhstone.model.workitem.WorkItem;
+import dev.alexhstone.model.workitem.WorkItemDeserializer;
+import dev.alexhstone.model.workitem.WorkItemSerializer;
 import dev.alexhstone.util.PrettyPrintNumberFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -70,7 +70,7 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
     }
 
     public void initialise() {
-        log.info("About to initialise the queue [{}] with brokerURL: [{}]",
+        log.info("About to initialise the workitem [{}] with brokerURL: [{}]",
                 queueName, brokerURL);
         try {
             connection = connectionFactory.createConnection();
@@ -85,7 +85,7 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
                     .formatted(brokerURL, e.getMessage());
             throw new RuntimeException(message, e);
         }
-        log.info("Successfully initialised the queue [{}] with brokerURL: [{}]",
+        log.info("Successfully initialised the workitem [{}] with brokerURL: [{}]",
                 queueName, brokerURL);
     }
 
@@ -99,7 +99,7 @@ public class DurableQueueImpl implements QueuePublisher, QueueConsumer {
                     e.getMessage(), e);
             return Status.FAILURE;
         }
-        log.info("Successfully closed the connection and session to the queue");
+        log.info("Successfully closed the connection and session to the workitem");
         log.info("Consumed: {} messages", toPrettyPrint(numberOfMessagesConsumed));
         log.info("Published: {} messages", toPrettyPrint(numberOfMessagesPublished));
         return Status.SUCCESS;

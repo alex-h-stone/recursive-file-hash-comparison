@@ -1,6 +1,6 @@
 package dev.alexhstone.producer;
 
-import dev.alexhstone.model.queue.WorkItem;
+import dev.alexhstone.model.workitem.WorkItem;
 import dev.alexhstone.queue.DurableQueueImpl;
 import dev.alexhstone.queue.QueuePublisher;
 import dev.alexhstone.queue.Status;
@@ -34,7 +34,7 @@ public class PublishWorkItemsToQueue {
 
     public static void main(String[] args) {
         List<String> workingDirectoriesList = Arrays.asList(args);
-        log.debug("About to publish file work items from the working directories [{}] to the queue",
+        log.debug("About to publish file work items from the working directories [{}] to the workitem",
                 workingDirectoriesList);
 
         DirectoryValidator directoryValidator = new DirectoryValidator();
@@ -60,7 +60,7 @@ public class PublishWorkItemsToQueue {
 
     private Consumer<WorkItem> publishToQueue() {
         return workItem -> {
-            log.debug("About to add WorkItem to the queue: {}", workItem);
+            log.debug("About to add WorkItem to the workitem: {}", workItem);
             Status publishStatus = queue.publish(workItem);
             if(Status.SUCCESS.equals(publishStatus)){
                 log.debug("Successfully published the message (work item) [{}]", workItem);

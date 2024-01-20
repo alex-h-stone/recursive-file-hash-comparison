@@ -1,8 +1,8 @@
 package dev.alexhstone.consumer;
 
-import dev.alexhstone.datastore.WorkItemHashResultRepository;
-import dev.alexhstone.model.datastore.HashResult;
-import dev.alexhstone.model.queue.WorkItem;
+import dev.alexhstone.datastore.HashResultRepository;
+import dev.alexhstone.model.hashresult.HashResult;
+import dev.alexhstone.model.workitem.WorkItem;
 import dev.alexhstone.queue.DurableQueueImpl;
 import dev.alexhstone.queue.QueueConsumer;
 import dev.alexhstone.util.Clock;
@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ProcessWorkItemsFromTheQueue {
 
     private final QueueConsumer queueConsumer;
-    private final WorkItemHashResultRepository repository;
+    private final HashResultRepository repository;
     private final WorkItemToHashResultMapper mapper;
 
     public static void main(String[] args) {
@@ -25,13 +25,13 @@ public class ProcessWorkItemsFromTheQueue {
 
     public ProcessWorkItemsFromTheQueue() {
         this.queueConsumer = new DurableQueueImpl();
-        this.repository = new WorkItemHashResultRepository();
+        this.repository = new HashResultRepository();
         this.mapper = new WorkItemToHashResultMapper(new Clock());
     }
 
     private void execute() {
         queueConsumer.initialise();
-        log.info("About to process work items from the queue");
+        log.info("About to process work items from the workitem");
         AtomicInteger numberOfContinuousUnsuccessfulDequeues = new AtomicInteger(0);
         do {
             Optional<WorkItem> fileWorkItemOptional = queueConsumer.consumeMessage();
@@ -55,7 +55,7 @@ public class ProcessWorkItemsFromTheQueue {
             }
         } while (numberOfContinuousUnsuccessfulDequeues.get() < 50);
 
-        log.info("Completed processing all work items on the queue");
+        log.info("Completed processing all work items on the workitem");
         queueConsumer.destroy();
     }
 }

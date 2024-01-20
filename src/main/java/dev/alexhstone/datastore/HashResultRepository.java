@@ -6,10 +6,10 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
-import dev.alexhstone.model.datastore.HashResult;
-import dev.alexhstone.model.datastore.HashResultDeserializer;
-import dev.alexhstone.model.datastore.HashResultSerializer;
-import dev.alexhstone.model.queue.WorkItem;
+import dev.alexhstone.model.hashresult.HashResult;
+import dev.alexhstone.model.hashresult.HashResultDeserializer;
+import dev.alexhstone.model.hashresult.HashResultSerializer;
+import dev.alexhstone.model.workitem.WorkItem;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 
@@ -17,9 +17,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Slf4j
-public class WorkItemHashResultRepository {
+public class HashResultRepository {
 
     private final HashResultDeserializer deserializer = new HashResultDeserializer();
     private final HashResultSerializer serializer = new HashResultSerializer();
@@ -27,11 +29,11 @@ public class WorkItemHashResultRepository {
     private final MongoCollection<Document> collection;
 
     public static void main(String[] args) {
-        WorkItemHashResultRepository repository = new WorkItemHashResultRepository();
+        HashResultRepository repository = new HashResultRepository();
         Optional<HashResult> hashResult = repository.retrieveHashResultByAbsolutePath("F:\\Data\\Audio\\A\\AC DC\\AC DC - Let There Be Rock\\05 AC DC - Problem Child.mp3");
     }
 
-    public WorkItemHashResultRepository() {
+    public HashResultRepository() {
         MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
 
         MongoDatabase database = mongoClient.getDatabase("FileSystemHashCache");
@@ -89,8 +91,29 @@ public class WorkItemHashResultRepository {
 
         Document matchingDocument = matchingDocuments.get(0);
 
+        return Optional.of(deserialise(matchingDocument));
+    }
+
+    private HashResult deserialise(Document matchingDocument) {
         String hashResultJson = matchingDocument.getString("hashResultJSON");
-        HashResult hashResult = deserializer.fromJson(hashResultJson);
-        return Optional.of(hashResult);
+        return deserializer.fromJson(hashResultJson);
+    }
+
+    public void applyToAll(Consumer<HashResult> hashResultConsumer) {
+        collection.find()
+                .allowDiskUse(true)
+                .batchSize(100)
+                .spliterator()
+                .forEachRemaining(document -> hashResultConsumer.accept(deserialise(document)));
+    }
+
+    public List<HashResult> getByHashValue(String hashValue) {
+        List<Document> matchingDocuments = new ArrayList<>();
+        collection.find(Filters.eq("hashValue", hashValue))
+                .into(matchingDocuments);
+
+        return matchingDocuments.stream()
+                .map(this::deserialise)
+                .collect(Collectors.toList());
     }
 }

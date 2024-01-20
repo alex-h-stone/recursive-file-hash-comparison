@@ -2,10 +2,10 @@ package dev.alexhstone.model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dev.alexhstone.model.datastore.HashResult;
-import dev.alexhstone.model.datastore.HashResultSerializerAndDeserializer;
-import dev.alexhstone.model.queue.WorkItem;
-import dev.alexhstone.model.queue.WorkItemGsonSerializerAndDeserializer;
+import dev.alexhstone.model.hashresult.HashResult;
+import dev.alexhstone.model.hashresult.HashResultSerializerAndDeserializer;
+import dev.alexhstone.model.workitem.WorkItem;
+import dev.alexhstone.model.workitem.WorkItemGsonSerializerAndDeserializer;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass

@@ -1,6 +1,6 @@
 package dev.alexhstone.queue;
 
-import dev.alexhstone.model.queue.WorkItem;
+import dev.alexhstone.model.workitem.WorkItem;
 
 import java.util.Optional;
 

@@ -1,4 +1,4 @@
-package dev.alexhstone.model.datastore;
+package dev.alexhstone.model.hashresult;
 
 import lombok.Builder;
 import lombok.Value;
@@ -13,8 +13,10 @@ public class HashResult {
     String name;
     String absolutePath;
     String absolutePathToWorkingDirectory;
+    // TODO Add partitition UUID
     String relativePath;
     String relativePathToFile; // Note: This will be identical to relativePath for directories
+    FileSystemType fileSystemType;
     BigInteger sizeInBytes;
     String size;
     Instant workItemCreationTime;

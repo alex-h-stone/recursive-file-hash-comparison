@@ -1,6 +1,6 @@
 package dev.alexhstone.producer;
 
-import dev.alexhstone.model.queue.WorkItem;
+import dev.alexhstone.model.workitem.WorkItem;
 import dev.alexhstone.util.Clock;
 import dev.alexhstone.validation.DirectoryValidator;
 import dev.alexhstone.validation.FileValidator;

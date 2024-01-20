@@ -47,24 +47,31 @@ public class HashCalculator {
         log.debug("About to calculate the {} hash for: [{}]",
                 HASH_ALGORITHM,
                 file.getAbsolutePath());
+
+        MessageDigest messageDigest = calculateMessageDigestFor(file);
+        byte[] digested = messageDigest.digest();
+
+        log.debug("Completed calculating {} hash for: [{}]",
+                HASH_ALGORITHM, file.getAbsolutePath());
+
+        return digested;
+    }
+
+    private MessageDigest calculateMessageDigestFor(File file) {
         try {
-            InputStream fis = new FileInputStream(file);
+            InputStream fileInputStream = new FileInputStream(file);
             byte[] byteArray = new byte[1024];
             int bytesCount;
 
             MessageDigest messageDigest = HASH_ALGORITHM.getAlgorithm();
-            while ((bytesCount = fis.read(byteArray)) != -1) {
+            while ((bytesCount = fileInputStream.read(byteArray)) != -1) {
                 messageDigest.update(byteArray, 0, bytesCount);
             }
+            fileInputStream.close();
 
-            fis.close();
-
-            byte[] digested = messageDigest.digest();
-            log.debug("Completed calculating {} hash for: [{}]",
-                    HASH_ALGORITHM, file.getAbsolutePath());
-            return digested;
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            return messageDigest;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

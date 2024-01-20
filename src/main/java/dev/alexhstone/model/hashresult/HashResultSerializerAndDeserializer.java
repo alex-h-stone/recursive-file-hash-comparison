@@ -1,4 +1,4 @@
-package dev.alexhstone.model.datastore;
+package dev.alexhstone.model.hashresult;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -23,6 +23,7 @@ public class HashResultSerializerAndDeserializer implements JsonSerializer<HashR
         jsonObject.addProperty("absolutePathToWorkingDirectory", hashResult.getAbsolutePathToWorkingDirectory());
         jsonObject.addProperty("relativePath", hashResult.getRelativePath());
         jsonObject.addProperty("relativePathToFile", hashResult.getRelativePathToFile());
+        jsonObject.addProperty("fileSystemType", hashResult.getFileSystemType().name());
         jsonObject.addProperty("sizeInBytes", hashResult.getSizeInBytes());
         jsonObject.addProperty("size", hashResult.getSize());
         jsonObject.addProperty("workItemCreationTime", hashResult.getWorkItemCreationTime().toEpochMilli());
@@ -45,6 +46,7 @@ public class HashResultSerializerAndDeserializer implements JsonSerializer<HashR
                 .absolutePathToWorkingDirectory(jsonObject.get("absolutePathToWorkingDirectory").getAsString())
                 .relativePath(jsonObject.get("relativePath").getAsString())
                 .relativePathToFile(jsonObject.get("relativePathToFile").getAsString())
+                .fileSystemType(FileSystemType.valueOf(jsonObject.get("relativePathToFile").getAsString()))
                 .sizeInBytes(jsonObject.get("sizeInBytes").getAsBigInteger())
                 .size(jsonObject.get("size").getAsString())
                 .workItemCreationTime(Instant.ofEpochMilli(jsonObject.get("workItemCreationTime").getAsLong()))
