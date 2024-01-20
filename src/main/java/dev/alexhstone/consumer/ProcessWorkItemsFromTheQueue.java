@@ -38,11 +38,11 @@ public class ProcessWorkItemsFromTheQueue {
             if (fileWorkItemOptional.isPresent()) {
 
                 WorkItem workItem = fileWorkItemOptional.get();
-                log.debug("About to process the work item with ID: [{}]", workItem.getId());
+                log.debug("About to process the workItem with ID: [{}]", workItem.getId());
                 numberOfContinuousUnsuccessfulDequeues.set(0);
 
                 if (repository.hasAlreadyBeenCalculated(workItem)) {
-                    log.info("Work item with ID [{}] has already been calculated so NOT processing",
+                    log.warn("Work item with ID [{}] has already been calculated so NOT processing",
                             workItem.getId());
                     continue;
                 }

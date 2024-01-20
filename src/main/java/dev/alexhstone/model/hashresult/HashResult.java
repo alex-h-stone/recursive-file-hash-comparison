@@ -13,7 +13,7 @@ public class HashResult {
     String name;
     String absolutePath;
     String absolutePathToWorkingDirectory;
-    // TODO Add partitition UUID
+    String partitionUuid;
     String relativePath;
     String relativePathToFile; // Note: This will be identical to relativePath for directories
     FileSystemType fileSystemType;

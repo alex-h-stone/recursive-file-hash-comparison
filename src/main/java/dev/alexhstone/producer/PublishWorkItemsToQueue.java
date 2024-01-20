@@ -34,7 +34,7 @@ public class PublishWorkItemsToQueue {
 
     public static void main(String[] args) {
         List<String> workingDirectoriesList = Arrays.asList(args);
-        log.debug("About to publish file work items from the working directories [{}] to the workitem",
+        log.info("About to publish file work items from the working directories {} to the queue",
                 workingDirectoriesList);
 
         DirectoryValidator directoryValidator = new DirectoryValidator();
@@ -60,12 +60,12 @@ public class PublishWorkItemsToQueue {
 
     private Consumer<WorkItem> publishToQueue() {
         return workItem -> {
-            log.debug("About to add WorkItem to the workitem: {}", workItem);
+            log.debug("About to publish the WorkItem with AbsolutePath: [{}]", workItem.getAbsolutePath());
             Status publishStatus = queue.publish(workItem);
             if(Status.SUCCESS.equals(publishStatus)){
-                log.debug("Successfully published the message (work item) [{}]", workItem);
+                log.debug("Successfully published the message (WorkItem) with AbsolutePath: [{}]", workItem.getAbsolutePath());
             } else {
-                log.warn("Failed to publish the message (work item) [{}]", workItem);
+                log.warn("Failed to publish the message (WorkItem) [{}]", workItem);
             }
         };
     }

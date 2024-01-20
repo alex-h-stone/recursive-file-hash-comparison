@@ -1,6 +1,5 @@
 package dev.alexhstone.diskmetadata;
 
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import oshi.SystemInfo;
@@ -45,20 +44,21 @@ public class MetaDataRetriever {
 
         List<PartitionAndDisk> matchingPartitions = partitionsAndDisks
                 .stream()
-                .filter(o ->
-                {
-                    String mountPoint = o.getPartition().getMountPoint();
-                    return StringUtils.containsIgnoreCase(mountPoint,singleLetterLogicalDriveIdentifier);
-                })
-                .collect(Collectors.toList());
+                .filter(o -> StringUtils.containsIgnoreCase(o.partition().getMountPoint(), singleLetterLogicalDriveIdentifier))
+                .toList();
 
         if (matchingPartitions.isEmpty()) {
             return Optional.empty();
         }
 
-        PartitionAndDisk hwPartition = matchingPartitions.get(0);
+        if (matchingPartitions.size() > 1) {
+            String message = "Unexpectedly found [%d] partitions matching [%s] which are [%s]"
+                    .formatted(matchingPartitions.size(), logicalDriveLetter, matchingPartitions);
+            throw new IllegalStateException(message);
+        }
+        PartitionAndDisk partitionAndDisk = matchingPartitions.get(0);
 
-        return Optional.of(createPartitionMetaData(hwPartition));
+        return Optional.of(createPartitionMetaData(partitionAndDisk));
     }
 
     private List<PartitionAndDisk> retrievePartitionsWithDisks(List<HWDiskStore> diskStores) {
@@ -101,9 +101,14 @@ public class MetaDataRetriever {
         return StringUtils.trim(stringToBeTrimmed);
     }
 
-    @Value
-    private static class PartitionAndDisk {
-        HWPartition partition;
-        HWDiskStore disk;
+    public String retrievePartitionUuid(String partitionMountPointLetter) {
+        Optional<PartitionMetaData> partitionMetaDataOptional = retrieveMetaDataFor(partitionMountPointLetter);
+        if (partitionMetaDataOptional.isEmpty()) {
+            return "Unknown Partition UUID from [%s]".formatted(partitionMountPointLetter);
+        }
+        return partitionMetaDataOptional.get().getUuid();
+    }
+
+    private record PartitionAndDisk(HWPartition partition, HWDiskStore disk) {
     }
 }

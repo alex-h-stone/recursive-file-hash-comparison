@@ -11,6 +11,6 @@ import java.util.List;
 @Builder
 public class WorkingDirectoryHashResults {
 
-    String absolutePathToWorkingDirectory;
+    String partitionUuid; // TODO check population
     List<HashResult> hashResults;
 }

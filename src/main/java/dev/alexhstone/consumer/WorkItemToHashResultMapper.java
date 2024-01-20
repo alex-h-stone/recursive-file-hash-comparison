@@ -1,5 +1,6 @@
 package dev.alexhstone.consumer;
 
+import dev.alexhstone.diskmetadata.MetaDataRetriever;
 import dev.alexhstone.model.hashresult.FileSystemType;
 import dev.alexhstone.model.hashresult.HashResult;
 import dev.alexhstone.model.workitem.WorkItem;
@@ -18,6 +19,7 @@ public class WorkItemToHashResultMapper {
 
     private final HashCalculator hashCalculator = new HashCalculator();
     private final PathValidator pathValidator = new PathValidator();
+    private final MetaDataRetriever metaDataRetriever = new MetaDataRetriever();
     private final Clock clock;
 
     public HashResult map(WorkItem workItem) {
@@ -37,6 +39,7 @@ public class WorkItemToHashResultMapper {
                 .name(workItem.getName())
                 .absolutePath(absolutePathString)
                 .absolutePathToWorkingDirectory(absolutePathToWorkingDirectoryString)
+                .partitionUuid(metaDataRetriever.retrievePartitionUuid(absolutePathString))
                 .relativePath(relativePath.toString())
                 .relativePathToFile(pathToWorkingDirectory.relativize(pathToWorkItem).toString())
                 .fileSystemType(FileSystemType.valueOfFile(file))

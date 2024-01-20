@@ -42,6 +42,7 @@ public class HashResultRepository {
         collection.createIndex(Indexes.hashed("absolutePath"));
         collection.createIndex(Indexes.hashed("relativePathToFile"));
         collection.createIndex(Indexes.hashed("hashValue"));
+        collection.createIndex(Indexes.hashed("partitionUuid"));
     }
 
     public void put(HashResult hashResult) {
@@ -50,14 +51,15 @@ public class HashResultRepository {
         if (existingFileHashResult.isEmpty()) {
             String json = serializer.toJson(hashResult);
             Document document = new Document("hashResultJSON", json);
-            document.append("absolutePath", hashResult.getAbsolutePath())
+            document.append("absolutePath", hashResult.getAbsolutePath()) // TODO link the indexes to fields
                     .append("relativePathToFile", hashResult.getRelativePathToFile())
-                    .append("hashValue", hashResult.getHashValue());
+                    .append("hashValue", hashResult.getHashValue())
+                    .append("partitionUuid", hashResult.getPartitionUuid());
             collection.insertOne(document);
+        } else {
+            log.warn("Found id collision as [{}] is already in the repository so not inserting",
+                    hashResult);
         }
-
-        log.warn("Found id collision as [{}] is already in the repository so not inserting",
-                hashResult);
     }
 
     public boolean hasAlreadyBeenCalculated(WorkItem workItem) {
