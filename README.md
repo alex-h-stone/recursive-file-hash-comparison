@@ -24,6 +24,14 @@ work item consumer.
 
 
 #### Work item consumer
+Responsible for dequeuing Work Item messages from the queue.
+Each Work Item is processed to produce a Hash Result which contains a variety of file meta-data including the hash of the file.
+
+All hash results are deserialised into JSON and persisted in a MongoDB collection and indexed on a number of fields including the hash.
+
+## Extra 
+on startup publish and consumer to a test queue
+and store and retrieve to a test collection 
 
 
 Comparison Report Generator
