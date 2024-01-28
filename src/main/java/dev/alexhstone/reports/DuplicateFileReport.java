@@ -1,36 +1,31 @@
 package dev.alexhstone.reports;
 
-import dev.alexhstone.datastore.HashResultRepository;
+import dev.alexhstone.datastore.HashResultPersistenceService;
 import dev.alexhstone.model.hashresult.HashResult;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.function.Consumer;
 
 @Slf4j
+@Service
+@AllArgsConstructor
 public class DuplicateFileReport {
 
-    private final HashResultRepository hashResultRepository;
+    private final HashResultPersistenceService persistenceService;
 
-    public static void main(String[] args) {
-        DuplicateFileReport duplicateFileReport = new DuplicateFileReport();
-        duplicateFileReport.execute();
-    }
-
-    public DuplicateFileReport() {
-        hashResultRepository = new HashResultRepository();
-    }
-
-    private void execute() {
+    public void execute() {
         // identify same hash but different absolute path and different working directory
         // iterate through whole colelction
         // for each entry do a get and compare
-        hashResultRepository.applyToAll(new Consumer<HashResult>() {
+        persistenceService.applyToAll(new Consumer<HashResult>() {
             @Override
             public void accept(HashResult sourceHashResult) {
                 if (!"[Cannot calculate hash for a directory]".equals(sourceHashResult.getHashValue())) {
                     String hashValue = sourceHashResult.getHashValue();
-                    List<HashResult> matchingHashResults = hashResultRepository.getByHashValue(hashValue);
+                    List<HashResult> matchingHashResults = persistenceService.getByHashValue(hashValue);
                     matchingHashResults.forEach(new Consumer<HashResult>() {
                         @Override
                         public void accept(HashResult hashResultToCheck) {

@@ -1,12 +1,17 @@
 package dev.alexhstone.config;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+@Getter
+@Setter
+@Configuration
+@ConfigurationProperties(prefix = "application.config")
 public class ApplicationConfiguration {
 
-    public static String getActiveMQBrokerURL() {
-        return "tcp://localhost:61616";
-    }
-
-    public static String getActiveMQQueueName() {
-        return "testQueue";
-    }
+    private String workingDirectories;
+    private String jmsBrokerUrl;
+    private String jmsQueueName;
 }

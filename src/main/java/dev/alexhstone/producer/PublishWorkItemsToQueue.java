@@ -1,18 +1,19 @@
 package dev.alexhstone.producer;
 
+import dev.alexhstone.config.ApplicationConfiguration;
 import dev.alexhstone.model.workitem.WorkItem;
-import dev.alexhstone.queue.DurableQueueImpl;
 import dev.alexhstone.queue.QueuePublisher;
 import dev.alexhstone.queue.Status;
 import dev.alexhstone.util.Clock;
 import dev.alexhstone.util.PathWalker;
 import dev.alexhstone.validation.DirectoryValidator;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -21,19 +22,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
+@Component
+@AllArgsConstructor
 public class PublishWorkItemsToQueue {
 
+    private final ApplicationConfiguration configuration;
     private final QueuePublisher queue;
-    private final Set<Path> workingDirectories;
 
-    public PublishWorkItemsToQueue(QueuePublisher queuePublisher,
-                                   Set<Path> workingDirectories) {
-        this.queue = queuePublisher;
-        this.workingDirectories = Collections.unmodifiableSet(workingDirectories);
-    }
-
-    public static void main(String[] args) {
-        List<String> workingDirectoriesList = Arrays.asList(args);
+    public void execute() {
+        // TODO handle multiple directories, split on ,?
+        List<String> workingDirectoriesList = Arrays.asList(configuration.getWorkingDirectories());
         log.info("About to publish file work items from the working directories {} to the queue",
                 workingDirectoriesList);
 
@@ -43,15 +41,9 @@ public class PublishWorkItemsToQueue {
                 .map(directoryValidator::validateExists)
                 .collect(Collectors.toSet());
 
-        PublishWorkItemsToQueue publishWorkItemsToQueue =
-                new PublishWorkItemsToQueue(new DurableQueueImpl(),
-                        validatedWorkingDirectories);
-        publishWorkItemsToQueue.execute();
-    }
 
-    private void execute() {
         queue.initialise();
-        workingDirectories
+        validatedWorkingDirectories
                 .parallelStream()
                 .forEach(workingDirectory -> toStreamOfWorkItems(workingDirectory)
                         .forEach(publishToQueue()));

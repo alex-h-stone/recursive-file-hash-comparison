@@ -1,37 +1,28 @@
 package dev.alexhstone.consumer;
 
-import dev.alexhstone.datastore.HashResultRepository;
+import dev.alexhstone.datastore.HashResultPersistenceService;
 import dev.alexhstone.model.hashresult.HashResult;
 import dev.alexhstone.model.workitem.WorkItem;
-import dev.alexhstone.queue.DurableQueueImpl;
 import dev.alexhstone.queue.QueueConsumer;
-import dev.alexhstone.util.Clock;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
+@Service
+@AllArgsConstructor
 public class ProcessWorkItemsFromTheQueue {
 
+    private final WorkItemToHashResultMapper mapper = new WorkItemToHashResultMapper();
     private final QueueConsumer queueConsumer;
-    private final HashResultRepository repository;
-    private final WorkItemToHashResultMapper mapper;
+    private final HashResultPersistenceService persistenceService;
 
-    public static void main(String[] args) {
-        ProcessWorkItemsFromTheQueue processWorkItemsFromTheQueue = new ProcessWorkItemsFromTheQueue();
-        processWorkItemsFromTheQueue.execute();
-    }
-
-    public ProcessWorkItemsFromTheQueue() {
-        this.queueConsumer = new DurableQueueImpl();
-        this.repository = new HashResultRepository();
-        this.mapper = new WorkItemToHashResultMapper(new Clock());
-    }
-
-    private void execute() {
+    public void execute() {
         queueConsumer.initialise();
-        log.info("About to process work items from the workitem");
+        log.info("About to process work items from the queue");
         AtomicInteger numberOfContinuousUnsuccessfulDequeues = new AtomicInteger(0);
         do {
             Optional<WorkItem> fileWorkItemOptional = queueConsumer.consumeMessage();
@@ -41,21 +32,21 @@ public class ProcessWorkItemsFromTheQueue {
                 log.debug("About to process the workItem with ID: [{}]", workItem.getId());
                 numberOfContinuousUnsuccessfulDequeues.set(0);
 
-                if (repository.hasAlreadyBeenCalculated(workItem)) {
+                if (persistenceService.hasAlreadyBeenCalculated(workItem)) {
                     log.warn("Work item with ID [{}] has already been calculated so NOT processing",
                             workItem.getId());
                     continue;
                 }
 
                 HashResult hashResult = mapper.map(workItem);
-                repository.put(hashResult);
+                persistenceService.put(hashResult);
                 log.debug("Completed processing the work item with ID: [{}]", workItem.getId());
             } else {
                 numberOfContinuousUnsuccessfulDequeues.incrementAndGet();
             }
         } while (numberOfContinuousUnsuccessfulDequeues.get() < 50);
 
-        log.info("Completed processing all work items on the workitem");
+        log.info("Completed processing all work items on the queue");
         queueConsumer.destroy();
     }
 }

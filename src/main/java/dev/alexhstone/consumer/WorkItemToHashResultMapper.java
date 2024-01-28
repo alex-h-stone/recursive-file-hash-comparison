@@ -7,20 +7,26 @@ import dev.alexhstone.model.workitem.WorkItem;
 import dev.alexhstone.util.Clock;
 import dev.alexhstone.validation.FileValidator;
 import dev.alexhstone.validation.PathValidator;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.math.BigInteger;
 import java.nio.file.Path;
 
-@RequiredArgsConstructor
 public class WorkItemToHashResultMapper {
 
     private final HashCalculator hashCalculator = new HashCalculator();
     private final PathValidator pathValidator = new PathValidator();
     private final MetaDataRetriever metaDataRetriever = new MetaDataRetriever();
     private final Clock clock;
+
+    public WorkItemToHashResultMapper(Clock clock) {
+        this.clock = clock;
+    }
+
+    public WorkItemToHashResultMapper(){
+        this(new Clock());
+    }
 
     public HashResult map(WorkItem workItem) {
         String absolutePathString = workItem.getAbsolutePath();
