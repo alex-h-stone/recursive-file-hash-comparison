@@ -59,8 +59,8 @@ public class DurableQueue implements QueuePublisher, QueueConsumer {
         try {
             jmsTemplate.convertAndSend(messageText);
         } catch (JmsException e) {
-            log.error("Unable to publish the message with ID: [{}] and messageText: [{}] because of the error: [{}]",
-                    id, messageText, e.getMessage(), e);
+            log.info("Unable to publish the message with ID: [{}] because of the error: [{}] and cause [{}]",
+                    id, e.getMessage(), e.getCause().getMessage());
             return Status.FAILURE;
         }
 

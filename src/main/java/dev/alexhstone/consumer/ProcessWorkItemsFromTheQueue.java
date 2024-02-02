@@ -18,7 +18,7 @@ public class ProcessWorkItemsFromTheQueue {
 
     private final WorkItemToHashResultMapper mapper = new WorkItemToHashResultMapper();
     private final QueueConsumer queueConsumer;
-    private final HashResultPersistenceService persistenceService;
+    private final HashResultPersistenceService hashResultPersistenceService;
 
     public void execute() {
         queueConsumer.initialise();
@@ -32,14 +32,14 @@ public class ProcessWorkItemsFromTheQueue {
                 log.debug("About to process the workItem with ID: [{}]", workItem.getId());
                 numberOfContinuousUnsuccessfulDequeues.set(0);
 
-                if (persistenceService.hasAlreadyBeenCalculated(workItem)) {
+                if (hashResultPersistenceService.hasAlreadyBeenCalculated(workItem)) {
                     log.warn("Work item with ID [{}] has already been calculated so NOT processing",
                             workItem.getId());
                     continue;
                 }
 
                 HashResult hashResult = mapper.map(workItem);
-                persistenceService.put(hashResult);
+                hashResultPersistenceService.store(hashResult);
                 log.debug("Completed processing the work item with ID: [{}]", workItem.getId());
             } else {
                 numberOfContinuousUnsuccessfulDequeues.incrementAndGet();

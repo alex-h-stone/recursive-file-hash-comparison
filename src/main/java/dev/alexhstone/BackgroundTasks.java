@@ -13,12 +13,12 @@ public class BackgroundTasks {
     private final PublishWorkItemsToQueue publishWorkItemsToQueue;
     private final ProcessWorkItemsFromTheQueue processWorkItemsFromTheQueue;
 
-    @Scheduled(fixedRate = 5_000) // 5 sec
+    @Scheduled(fixedRate = 50_000)
     public void publishWorkItems() {
         publishWorkItemsToQueue.execute();
     }
 
-    @Scheduled(fixedRate = 5_000) // 5 sec
+    @Scheduled(fixedRate = 50_000)
     public void processWorkItems() {
         processWorkItemsFromTheQueue.execute();
     }

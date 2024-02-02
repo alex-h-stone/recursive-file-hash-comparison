@@ -1,6 +1,7 @@
 package dev.alexhstone.producer;
 
 import dev.alexhstone.config.ApplicationConfiguration;
+import dev.alexhstone.datastore.HashResultPersistenceService;
 import dev.alexhstone.model.workitem.WorkItem;
 import dev.alexhstone.queue.QueuePublisher;
 import dev.alexhstone.queue.Status;
@@ -9,6 +10,7 @@ import dev.alexhstone.util.PathWalker;
 import dev.alexhstone.validation.DirectoryValidator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -28,6 +30,7 @@ public class PublishWorkItemsToQueue {
 
     private final ApplicationConfiguration configuration;
     private final QueuePublisher queue;
+    private final HashResultPersistenceService persistenceService;
 
     public void execute() {
         // TODO handle multiple directories, split on ,?
@@ -41,10 +44,9 @@ public class PublishWorkItemsToQueue {
                 .map(directoryValidator::validateExists)
                 .collect(Collectors.toSet());
 
-
         queue.initialise();
         validatedWorkingDirectories
-                .parallelStream()
+                .stream()
                 .forEach(workingDirectory -> toStreamOfWorkItems(workingDirectory)
                         .forEach(publishToQueue()));
         queue.destroy();
@@ -54,7 +56,7 @@ public class PublishWorkItemsToQueue {
         return workItem -> {
             log.debug("About to publish the WorkItem with AbsolutePath: [{}]", workItem.getAbsolutePath());
             Status publishStatus = queue.publish(workItem);
-            if(Status.SUCCESS.equals(publishStatus)){
+            if (Status.SUCCESS.equals(publishStatus)) {
                 log.debug("Successfully published the message (WorkItem) with AbsolutePath: [{}]", workItem.getAbsolutePath());
             } else {
                 log.warn("Failed to publish the message (WorkItem) [{}]", workItem);
@@ -70,8 +72,9 @@ public class PublishWorkItemsToQueue {
 
         return pathWalker
                 .walk()
-                .parallel()
                 .map(Path::toFile)
+                .filter(file -> persistenceService.containsOutOfDateHashFor(file.getAbsolutePath(),
+                        FileUtils.sizeOfAsBigInteger(file)))
                 .map(toFileWorkItemMapper);
     }
 }

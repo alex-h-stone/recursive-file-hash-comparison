@@ -1,4 +1,4 @@
-package dev.alexhstone;
+package dev.alexhstone.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +14,7 @@ public class ThreadPoolConfig {
     @Bean
     public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
         ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(10);
+        threadPoolTaskScheduler.setPoolSize(4);
         threadPoolTaskScheduler.setThreadNamePrefix("ThreadPoolTaskScheduler");
         threadPoolTaskScheduler.setErrorHandler(t -> log.error("Error executing task: [{}]", t.getMessage(), t));
         threadPoolTaskScheduler.setThreadGroupName("ApplicationThreadGroupName");

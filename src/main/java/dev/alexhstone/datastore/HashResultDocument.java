@@ -6,6 +6,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigInteger;
+
 @Document(collection = "hashResults")
 @Getter
 @Builder
@@ -20,6 +22,8 @@ public class HashResultDocument {
     private String hashValue;
     @Indexed
     private String partitionUuid;
+
+    private BigInteger sourceFileSizeInBytes;
 
     private String hashResultJSON;
 }

@@ -10,8 +10,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -26,7 +28,7 @@ public class HashResultPersistenceService {
 
     private final HashResultRepository hashResultRepository;
 
-    public void put(HashResult hashResult) {
+    public void store(HashResult hashResult) {
         Optional<HashResult> existingFileHashResult = retrieveHashResultByAbsolutePath(hashResult.getAbsolutePath());
 
         if (existingFileHashResult.isEmpty()) {
@@ -36,6 +38,7 @@ public class HashResultPersistenceService {
                     .relativePathToFile(hashResult.getRelativePathToFile())
                     .hashValue(hashResult.getHashValue())
                     .partitionUuid(hashResult.getPartitionUuid())
+                    .sourceFileSizeInBytes(hashResult.getSizeInBytes())
                     .hashResultJSON(json)
                     .build();
 
@@ -97,5 +100,20 @@ public class HashResultPersistenceService {
         return documents.parallelStream()
                 .map(this::deserialise)
                 .collect(Collectors.toList());
+    }
+
+    public boolean containsOutOfDateHashFor(String absolutePath,
+                                            BigInteger fileSizeInBytes) {
+        if (Objects.isNull(fileSizeInBytes)) {
+            return false;
+        }
+
+        Optional<HashResultDocument> optionalHashResult = hashResultRepository.findById(absolutePath);
+        if (optionalHashResult.isEmpty()) {
+            return true;
+        }
+        BigInteger hashResultFileSizeInBytes = optionalHashResult.get().getSourceFileSizeInBytes();
+
+        return !fileSizeInBytes.equals(hashResultFileSizeInBytes);
     }
 }
