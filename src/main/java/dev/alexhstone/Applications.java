@@ -46,7 +46,7 @@ public class Applications {
 
     private void executeWithThreads(int numberOfThreads, Runnable runnable) {
 
-        try (ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads)) {
+        try (ExecutorService executor = Executors.newFixedThreadPool(2)) {
 
             Collection<Callable<String>> tasks = createTasks(numberOfThreads, runnable);
             List<Future<String>> futuresOfTasks = executor.invokeAll(tasks);
@@ -65,9 +65,9 @@ public class Applications {
         }
     }
 
-    private Collection<Callable<String>> createTasks(int numberOfThreads, Runnable runnable) {
+    private Collection<Callable<String>> createTasks(int numberOfTasksToCreate, Runnable runnable) {
         Collection<Callable<String>> tasks = new ArrayList<>();
-        for (int threadNumber = 1; threadNumber <= numberOfThreads; threadNumber++) {
+        for (int task = 1; task <= numberOfTasksToCreate; task++) {
             Callable<String> callable = Executors.callable(runnable, "Success");
             tasks.add(callable);
         }
