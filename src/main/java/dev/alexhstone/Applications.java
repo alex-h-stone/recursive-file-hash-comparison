@@ -1,10 +1,9 @@
 package dev.alexhstone;
 
-import dev.alexhstone.consumer.WorkItemConsumer;
-import dev.alexhstone.producer.WorkItemProducer;
-import dev.alexhstone.reports.DuplicateFileReport;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -15,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -25,29 +25,23 @@ public class Applications {
             stringFuture -> "Result:%s State:%s"
                     .formatted(stringFuture.resultNow(), stringFuture.state());
 
-    private final WorkItemProducer workItemProducer;
-    private final WorkItemConsumer workItemConsumer;
-    private final DuplicateFileReport duplicateFilesReport;
+    @Autowired
+    private List<RunnableApplication> runnableApplications;
 
     public void run(String applicationName) {
 
-        switch (applicationName) {
-            case "producer":
-                log.info("Executing workItemProducer");
-                executeWithThreads(1, workItemProducer::execute);
-                break;
-            case "consumer":
-                log.info("Executing workItemConsumer");
-                executeWithThreads(5, workItemConsumer::execute);
-                break;
-            case "findDuplicateFiles":
-                log.info("Executing duplicateFilesReport");
-                executeWithThreads(1, duplicateFilesReport::execute);
-                break;
-            default:
-                String message = "Unknown application name: [%s]".formatted(applicationName);
-                throw new IllegalArgumentException(message);
-        }
+        List<RunnableApplication> matchingApplications = runnableApplications.stream()
+                .filter(application -> application.matches(applicationName))
+                .collect(Collectors.toList());
+
+        Validate.notEmpty(matchingApplications, "Unknown application name: [%s]".formatted(applicationName));
+        Validate.isTrue(matchingApplications.size() == 1,
+                "Found multiple applications matching the name: [%s] they are: %s".formatted(applicationName, matchingApplications));
+
+        RunnableApplication application = matchingApplications.getFirst();
+
+        log.info("Executing {}", application.getApplicationName());
+        executeWithThreads(application.getNumberOfThreadsToUseForExecution(), application::execute);
     }
 
     private void executeWithThreads(int numberOfThreads, Runnable runnable) {
@@ -61,7 +55,7 @@ public class Applications {
                     .stream()
                     .map(TO_STATUS_STRING)
                     .toList();
-            log.info("All threads have completed their tasks with statuses: " + threadResults);
+            log.info("All threads have completed their tasks, results: {}", threadResults);
 
             executor.shutdown();
         } catch (InterruptedException e) {

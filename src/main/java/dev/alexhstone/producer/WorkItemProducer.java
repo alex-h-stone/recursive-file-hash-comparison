@@ -1,5 +1,6 @@
 package dev.alexhstone.producer;
 
+import dev.alexhstone.RunnableApplication;
 import dev.alexhstone.config.ApplicationConfiguration;
 import dev.alexhstone.datastore.HashResultPersistenceService;
 import dev.alexhstone.model.workitem.WorkItem;
@@ -26,12 +27,23 @@ import java.util.stream.Stream;
 @Slf4j
 @Component
 @AllArgsConstructor
-public class WorkItemProducer {
+public class WorkItemProducer implements RunnableApplication {
 
     private final ApplicationConfiguration configuration;
     private final QueuePublisher queue;
     private final HashResultPersistenceService persistenceService;
 
+    @Override
+    public boolean matches(String applicationNameToMatch) {
+        return "producer".equalsIgnoreCase(applicationNameToMatch);
+    }
+
+    @Override
+    public String getApplicationName() {
+        return "workItemProducer";
+    }
+
+    @Override
     public void execute() {
         // TODO handle multiple directories, split on ,?
         // TODO Add many working directories, add logic to warn and skip if not present
