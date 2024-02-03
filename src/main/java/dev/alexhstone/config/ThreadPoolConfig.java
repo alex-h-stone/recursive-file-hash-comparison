@@ -1,26 +1,36 @@
 package dev.alexhstone.config;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.util.concurrent.Executor;
 
 @Configuration
-@Slf4j
-@EnableScheduling
+@EnableAsync
 public class ThreadPoolConfig {
 
-    @Bean
-    public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
-        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(4);
-        threadPoolTaskScheduler.setThreadNamePrefix("ThreadPoolTaskScheduler");
-        threadPoolTaskScheduler.setErrorHandler(t -> log.error("Error executing task: [{}]", t.getMessage(), t));
-        threadPoolTaskScheduler.setThreadGroupName("ApplicationThreadGroupName");
-        threadPoolTaskScheduler.setWaitForTasksToCompleteOnShutdown(true);
-        threadPoolTaskScheduler.initialize();
-        threadPoolTaskScheduler.setBeanName("ThreadPoolTaskSchedulerBean");
-        return threadPoolTaskScheduler;
+    @Bean(name = "produceWorkItemExecutor")
+    public Executor publishTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(2);
+        executor.setQueueCapacity(1000);
+        executor.setThreadNamePrefix("producerTaskExecutor-");
+        executor.initialize();
+        return executor;
+    }
+
+    @Bean(name = "consumeWorkItemExecutor")
+    public Executor consumeTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(2000);
+        executor.setThreadNamePrefix("consumerTaskExecutor-");
+        executor.initialize();
+        return executor;
     }
 }
+

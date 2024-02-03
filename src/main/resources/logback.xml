@@ -8,26 +8,26 @@
     </appender>
 
 
-    <appender name="Publish" class="ch.qos.logback.core.FileAppender">
-        <file>Publish.log</file>
+    <appender name="Producer" class="ch.qos.logback.core.FileAppender">
+        <file>WorkItemProducer.log</file>
         <encoder>
             <pattern>%date %level [%thread] %logger %msg%n</pattern>
         </encoder>
     </appender>
 
-    <appender name="Consume" class="ch.qos.logback.core.FileAppender">
-        <file>Consume.log</file>
+    <appender name="Consumer" class="ch.qos.logback.core.FileAppender">
+        <file>WorkItemConsumer.log</file>
         <encoder>
             <pattern>%date %level [%thread] %logger %msg%n</pattern>
         </encoder>
     </appender>
 
-    <logger name="dev.alexhstone.producer.PublishWorkItemsToQueue" level="info" additivity="false">
-        <appender-ref ref="Publish"/>
+    <logger name="dev.alexhstone.producer.WorkItemProducer" level="info" additivity="false">
+        <appender-ref ref="Producer"/>
     </logger>
 
-    <logger name="dev.alexhstone.consumer.ProcessWorkItemsFromTheQueue" level="info" additivity="false">
-        <appender-ref ref="Consume"/>
+    <logger name="dev.alexhstone.consumer.WorkItemConsumer" level="info" additivity="false">
+        <appender-ref ref="Consumer"/>
     </logger>
 
     <root level="info">

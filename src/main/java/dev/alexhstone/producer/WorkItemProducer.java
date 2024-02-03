@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 @Slf4j
 @Component
 @AllArgsConstructor
-public class PublishWorkItemsToQueue {
+public class WorkItemProducer {
 
     private final ApplicationConfiguration configuration;
     private final QueuePublisher queue;
@@ -73,7 +73,8 @@ public class PublishWorkItemsToQueue {
         return pathWalker
                 .walk()
                 .map(Path::toFile)
-                .filter(file -> persistenceService.containsOutOfDateHashFor(file.getAbsolutePath(),
+                .filter(File::isFile)
+                .filter(file -> persistenceService.doesNotContainUpToDateHashFor(file.getAbsolutePath(),
                         FileUtils.sizeOfAsBigInteger(file)))
                 .map(toFileWorkItemMapper);
     }

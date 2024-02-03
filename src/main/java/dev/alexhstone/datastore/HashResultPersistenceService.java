@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -57,10 +56,11 @@ public class HashResultPersistenceService {
 
         HashResult existingHashResult = existingHashResultOptional.get();
 
-        Instant itemLastModifiedTime = workItem.getItemLastModifiedTime();
-        return workItem.getSizeInBytes().equals(existingHashResult.getSizeInBytes()) &&
-                itemLastModifiedTime != null &&
-                itemLastModifiedTime.isBefore(existingHashResult.getCreationTime());
+        boolean isWorkItemAndExistingResultSameFileSize = workItem.getSizeInBytes().equals(existingHashResult.getSizeInBytes());
+        if (isWorkItemAndExistingResultSameFileSize) {
+            log.info("Not calculating hash result as it has already been done for [{}]", workItem.getAbsolutePath());
+        }
+        return isWorkItemAndExistingResultSameFileSize;
     }
 
     private Optional<HashResult> retrieveHashResultByAbsolutePath(String absolutePath) {
@@ -102,8 +102,8 @@ public class HashResultPersistenceService {
                 .collect(Collectors.toList());
     }
 
-    public boolean containsOutOfDateHashFor(String absolutePath,
-                                            BigInteger fileSizeInBytes) {
+    public boolean doesNotContainUpToDateHashFor(String absolutePath,
+                                                 BigInteger fileSizeInBytes) {
         if (Objects.isNull(fileSizeInBytes)) {
             return false;
         }

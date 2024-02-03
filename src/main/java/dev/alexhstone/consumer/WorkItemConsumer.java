@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ProcessWorkItemsFromTheQueue {
+public class WorkItemConsumer {
 
     private final WorkItemToHashResultMapper mapper = new WorkItemToHashResultMapper();
     private final QueueConsumer queueConsumer;
@@ -33,7 +33,7 @@ public class ProcessWorkItemsFromTheQueue {
                 numberOfContinuousUnsuccessfulDequeues.set(0);
 
                 if (hashResultPersistenceService.hasAlreadyBeenCalculated(workItem)) {
-                    log.warn("Work item with ID [{}] has already been calculated so NOT processing",
+                    log.warn("Work item with Id [{}] has already been calculated so NOT processing",
                             workItem.getId());
                     continue;
                 }
