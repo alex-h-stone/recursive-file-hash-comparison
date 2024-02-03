@@ -9,7 +9,7 @@ import java.time.Instant;
 @Value
 @Builder
 public class WorkItem {
-
+    // TODO consider renaming this to FileWorkItem
     String name;
     String absolutePath;
     String absolutePathToWorkingDirectory;
@@ -17,7 +17,7 @@ public class WorkItem {
     Instant itemLastModifiedTime;
     Instant workItemCreationTime;
 
-    public String getId(){
+    public String getId() {
         return absolutePath;
     }
 }

@@ -34,6 +34,7 @@ public class WorkItemProducer {
 
     public void execute() {
         // TODO handle multiple directories, split on ,?
+        // TODO Add many working directories, add logic to warn and skip if not present
         List<String> workingDirectoriesList = Arrays.asList(configuration.getWorkingDirectories());
         log.info("About to publish file work items from the working directories {} to the queue",
                 workingDirectoriesList);

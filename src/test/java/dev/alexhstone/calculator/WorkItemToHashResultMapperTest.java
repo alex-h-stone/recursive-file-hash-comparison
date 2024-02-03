@@ -82,7 +82,7 @@ class WorkItemToHashResultMapperTest {
         WorkItem workItem = fileToWorkItemMapper.map(temporaryDirectory, existingFile);
         assertNotNull(workItem, "Failed precondition");
 
-       HashResult actualHashResult = mapper.map(workItem);
+        HashResult actualHashResult = mapper.map(workItem);
 
         Assertions.assertAll(
                 "Grouped Assertions of HashResult",
@@ -97,7 +97,6 @@ class WorkItemToHashResultMapperTest {
                 () -> assertThat(actualHashResult.getHashingAlgorithmName(), equalTo("SHA256")),
                 () -> assertThat(actualHashResult.getHashValue(),
                         equalTo("224ff5a028e147b555f07f3e833950acb250baa121c3cc742fc390f5fd5ff9ec")));
-
     }
 
     @Test
@@ -151,25 +150,5 @@ class WorkItemToHashResultMapperTest {
                 () -> assertThat(actualHashResult.getHashingAlgorithmName(), equalTo("SHA256")),
                 () -> assertThat(actualHashResult.getHashValue(),
                         equalTo("[Cannot calculate hash for a directory]")));
-    }
-
-    @Test
-    void shouldCreateFullyPopulatedFileHashResultForNowRemovedDirectory() {
-        // TODO
-    }
-
-    @Test
-    void shouldCreateFullyPopulatedFileHashResultForNowRemovedFile() {
-        // TODO
-    }
-
-    @Test
-    void shouldCreateFullyPopulatedFileHashResultForNowModifiedDirectory() {
-        // TODO
-    }
-
-    @Test
-    void shouldCreateFullyPopulatedFileHashResultForNowModifiedFile() {
-        // TODO
     }
 }

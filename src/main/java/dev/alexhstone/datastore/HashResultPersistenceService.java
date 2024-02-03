@@ -28,7 +28,7 @@ public class HashResultPersistenceService {
     private final HashResultRepository hashResultRepository;
 
     public void store(HashResult hashResult) {
-        Optional<HashResult> existingFileHashResult = retrieveHashResultByAbsolutePath(hashResult.getAbsolutePath());
+        Optional<HashResult> existingFileHashResult = getByAbsolutePath(hashResult.getAbsolutePath());
 
         if (existingFileHashResult.isEmpty()) {
             String json = serializer.toJson(hashResult);
@@ -49,7 +49,7 @@ public class HashResultPersistenceService {
     }
 
     public boolean hasAlreadyBeenCalculated(WorkItem workItem) {
-        Optional<HashResult> existingHashResultOptional = retrieveHashResultByAbsolutePath(workItem.getId());
+        Optional<HashResult> existingHashResultOptional = getByAbsolutePath(workItem.getId());
         if (existingHashResultOptional.isEmpty()) {
             return false;
         }
@@ -63,7 +63,7 @@ public class HashResultPersistenceService {
         return isWorkItemAndExistingResultSameFileSize;
     }
 
-    private Optional<HashResult> retrieveHashResultByAbsolutePath(String absolutePath) {
+    private Optional<HashResult> getByAbsolutePath(String absolutePath) {
         Optional<HashResultDocument> optionalDocument = hashResultRepository.findById(absolutePath);
 
 
@@ -96,6 +96,14 @@ public class HashResultPersistenceService {
 
     public List<HashResult> getByHashValue(String hashValue) {
         List<HashResultDocument> documents = hashResultRepository.findByHashValue(hashValue);
+
+        return documents.parallelStream()
+                .map(this::deserialise)
+                .collect(Collectors.toList());
+    }
+
+    public List<HashResult> getByHashValueAndPartitionUuid(String hashValue, String partitionUuid) {
+        List<HashResultDocument> documents = hashResultRepository.findByHashValueAndPartitionUuid(hashValue, partitionUuid);
 
         return documents.parallelStream()
                 .map(this::deserialise)

@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 
+// TODO replace "hashResults" collection name with either config driven or default
+// class name driven collection name
 @Document(collection = "hashResults")
 @Getter
 @Builder

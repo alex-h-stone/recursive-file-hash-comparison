@@ -12,6 +12,4 @@ import org.springframework.context.annotation.Configuration;
 public class ApplicationConfiguration {
 
     private String workingDirectories;
-    private String jmsBrokerUrl;
-    private String jmsQueueName;
 }

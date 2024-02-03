@@ -1,0 +1,18 @@
+application:
+  queue:
+    jmsBrokerUrl: tcp://localhost:61616
+    jmsQueueName: workItems
+  producer:
+    workingDirectories: F:\\Data
+  datastore: hashResults
+
+spring:
+  activemq:
+    broker-url: tcp://localhost:61616
+    pool:
+      enabled: true
+      max-connections: 10
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017
+      database: FileSystemHashCache

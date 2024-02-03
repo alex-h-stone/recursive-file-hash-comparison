@@ -16,25 +16,21 @@ public class DuplicateFileReport {
 
     private final HashResultPersistenceService persistenceService;
 
+    /**
+     * Identify all instances where two or more files have same hash but different partition UUIDs.
+     */
     public void execute() {
-        // identify same hash but different absolute path and different working directory
-        // iterate through whole colelction
-        // for each entry do a get and compare
         persistenceService.applyToAll(new Consumer<HashResult>() {
             @Override
             public void accept(HashResult sourceHashResult) {
                 if (!"[Cannot calculate hash for a directory]".equals(sourceHashResult.getHashValue())) {
                     String hashValue = sourceHashResult.getHashValue();
-                    List<HashResult> matchingHashResults = persistenceService.getByHashValue(hashValue);
-                    matchingHashResults.forEach(new Consumer<HashResult>() {
-                        @Override
-                        public void accept(HashResult hashResultToCheck) {
-                            log.debug("Processing {}", hashResultToCheck.getAbsolutePath());
-                            if (!sourceHashResult.getAbsolutePath().equals(hashResultToCheck.getAbsolutePath())) {
-                                log.info("Found duplicate files: [{}] and [{}]", sourceHashResult, hashResultToCheck);
-                            }
-                        }
-                    });
+                    List<HashResult> matchingHashResults = persistenceService.getByHashValueAndPartitionUuid(hashValue,
+                            sourceHashResult.getPartitionUuid());
+
+                    if (!matchingHashResults.isEmpty()) {
+                        log.warn("Found duplicate files: [{}]", matchingHashResults);
+                    }
                 }
             }
         });
