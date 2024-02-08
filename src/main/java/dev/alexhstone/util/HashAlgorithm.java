@@ -1,9 +1,7 @@
 package dev.alexhstone.util;
 
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
 
 public enum HashAlgorithm {
     SHA256("SHA-256");

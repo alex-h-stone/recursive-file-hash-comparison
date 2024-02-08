@@ -2,6 +2,7 @@ application:
   queue:
     jmsBrokerUrl: tcp://localhost:61616
     jmsQueueName: workItems
+    receiveTimeout: 1
   producer:
     workingDirectories: F:\\Data
   datastore: hashResults

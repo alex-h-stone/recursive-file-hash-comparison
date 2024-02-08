@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.support.destination.JmsDestinationAccessor;
 
 import java.time.Duration;
 
@@ -24,6 +23,9 @@ public class JmsConfig {
     @Value("${application.queue.jmsQueueName}")
     private String jmsQueueName;
 
+    @Value("${application.queue.receiveTimeout}")
+    private long receiveTimeout;
+
     @Bean
     public ConnectionFactory connectionFactory() {
         return new ActiveMQConnectionFactory(jmsBrokerUrl);
@@ -38,7 +40,7 @@ public class JmsConfig {
         jmsTemplate.setSessionAcknowledgeMode(Session.AUTO_ACKNOWLEDGE);
         jmsTemplate.setDeliveryMode(DeliveryMode.PERSISTENT);
         jmsTemplate.setTimeToLive(TIME_TO_LIVE_24_HOURS);
-        jmsTemplate.setReceiveTimeout(JmsDestinationAccessor.RECEIVE_TIMEOUT_INDEFINITE_WAIT);
+        jmsTemplate.setReceiveTimeout(receiveTimeout);
 
         return jmsTemplate;
     }

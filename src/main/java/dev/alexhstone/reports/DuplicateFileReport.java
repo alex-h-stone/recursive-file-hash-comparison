@@ -1,5 +1,6 @@
 package dev.alexhstone.reports;
 
+import dev.alexhstone.ProgressLogging;
 import dev.alexhstone.RunnableApplication;
 import dev.alexhstone.datastore.HashResultPersistenceService;
 import dev.alexhstone.model.hashresult.HashResult;
@@ -14,6 +15,9 @@ import java.util.List;
 @AllArgsConstructor
 public class DuplicateFileReport implements RunnableApplication {
 
+    private static final int LOGGING_INTERVAL_IN_ITEMS = 5_000;
+    private final ProgressLogging progressLogging =
+            new ProgressLogging("Processed another {} HashResult documents", LOGGING_INTERVAL_IN_ITEMS);
     private final HashResultPersistenceService persistenceService;
 
     @Override
@@ -31,6 +35,7 @@ public class DuplicateFileReport implements RunnableApplication {
      */
     public void execute() {
         persistenceService.applyToAll(sourceHashResult -> {
+            log.debug("Processing HashResult Document with absolutePath: [{}]", sourceHashResult.getAbsolutePath());
             if (!"[Cannot calculate hash for a directory]".equals(sourceHashResult.getHashValue())) {
                 String hashValue = sourceHashResult.getHashValue();
                 List<HashResult> matchingHashResults = persistenceService.getByHashValueAndPartitionUuid(hashValue,
@@ -40,6 +45,7 @@ public class DuplicateFileReport implements RunnableApplication {
                     log.warn("Found duplicate files: [{}]", matchingHashResults);
                 }
             }
+            progressLogging.incrementProgress();
         });
     }
 }
