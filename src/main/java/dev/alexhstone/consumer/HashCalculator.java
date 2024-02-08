@@ -60,7 +60,7 @@ public class HashCalculator {
     private MessageDigest calculateMessageDigestFor(File file) {
         try {
             InputStream fileInputStream = new FileInputStream(file);
-            byte[] byteArray = new byte[1024];
+            byte[] byteArray = new byte[10_000_000];
             int bytesCount;
 
             MessageDigest messageDigest = HASH_ALGORITHM.getAlgorithm();
