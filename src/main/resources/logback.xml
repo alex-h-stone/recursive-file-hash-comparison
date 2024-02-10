@@ -22,12 +22,23 @@
         </encoder>
     </appender>
 
+    <appender name="Reports" class="ch.qos.logback.core.FileAppender">
+        <file>reports.log</file>
+        <encoder>
+            <pattern>%date %level [%thread] %logger %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <logger name="dev.alexhstone.producer.WorkItemProducer" level="info" additivity="false">
         <appender-ref ref="Producer"/>
     </logger>
 
     <logger name="dev.alexhstone.consumer.WorkItemConsumer" level="info" additivity="false">
         <appender-ref ref="Consumer"/>
+    </logger>
+
+    <logger name="dev.alexhstone.reports" level="info" additivity="false">
+        <appender-ref ref="Reports"/>
     </logger>
 
     <root level="info">

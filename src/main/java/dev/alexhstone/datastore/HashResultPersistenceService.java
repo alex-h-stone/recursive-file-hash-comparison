@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class HashResultPersistenceService {
 
+    private static final int MAXIMUM_PAGE_SIZE = 1_000;
     private final HashResultDeserializer deserializer = new HashResultDeserializer();
     private final HashResultSerializer serializer = new HashResultSerializer();
 
@@ -82,16 +83,24 @@ public class HashResultPersistenceService {
     }
 
     public void applyToAll(Consumer<HashResult> hashResultConsumer) {
-        Page<HashResultDocument> page = hashResultRepository
-                .findAll(Pageable.ofSize(1_000));
+        Page<HashResultDocument> currentPage = hashResultRepository
+                .findAll(Pageable.ofSize(MAXIMUM_PAGE_SIZE));
+        log.info("About to apply hashResultConsumer {} pages where each page has a max size of {}",
+                currentPage.getTotalPages(), MAXIMUM_PAGE_SIZE);
 
         do {
-            List<HashResultDocument> documents = page.getContent();
+            log.info("Applying hashResultConsumer to page {} of {}", currentPage.getNumber(), currentPage.getTotalPages());
+            List<HashResultDocument> documents = currentPage.getContent();
             documents.parallelStream()
                     .map(this::deserialise)
                     .forEach(hashResultConsumer);
-        }
-        while (page.hasNext());
+            if (currentPage.hasNext()) {
+                Page<HashResultDocument> nextPage = hashResultRepository.findAll(currentPage.nextPageable());
+                currentPage = nextPage;
+            } else {
+                break;
+            }
+        } while (true);
     }
 
     public List<HashResult> getByHashValue(String hashValue) {
