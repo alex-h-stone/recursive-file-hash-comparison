@@ -4,6 +4,7 @@ import dev.alexhstone.model.hashresult.HashResult;
 import dev.alexhstone.model.hashresult.HashResultDeserializer;
 import dev.alexhstone.model.hashresult.HashResultSerializer;
 import dev.alexhstone.model.workitem.WorkItem;
+import dev.alexhstone.reports.DuplicateFileReport;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,6 +28,7 @@ public class HashResultPersistenceService {
     private final HashResultSerializer serializer = new HashResultSerializer();
 
     private final HashResultRepository hashResultRepository;
+    private final ReportRepository reportRepository;
 
     public void store(HashResult hashResult) {
         Optional<HashResult> existingFileHashResult = getByAbsolutePath(hashResult.getAbsolutePath());
@@ -85,22 +87,25 @@ public class HashResultPersistenceService {
     public void applyToAll(Consumer<HashResult> hashResultConsumer) {
         Page<HashResultDocument> currentPage = hashResultRepository
                 .findAll(Pageable.ofSize(MAXIMUM_PAGE_SIZE));
+        final int totalNumberOfPages = currentPage.getTotalPages();
         log.info("About to apply hashResultConsumer {} pages where each page has a max size of {}",
-                currentPage.getTotalPages(), MAXIMUM_PAGE_SIZE);
+                totalNumberOfPages, MAXIMUM_PAGE_SIZE);
 
-        do {
-            log.info("Applying hashResultConsumer to page {} of {}", currentPage.getNumber(), currentPage.getTotalPages());
+        for (; ; ) {
+            int zeroBasedPageNumber = currentPage.getNumber();
             List<HashResultDocument> documents = currentPage.getContent();
+            log.info("Applying hashResultConsumer to page {} of {} which contains {} hash results",
+                    zeroBasedPageNumber + 1, totalNumberOfPages, documents.size());
+
             documents.parallelStream()
                     .map(this::deserialise)
                     .forEach(hashResultConsumer);
-            if (currentPage.hasNext()) {
-                Page<HashResultDocument> nextPage = hashResultRepository.findAll(currentPage.nextPageable());
-                currentPage = nextPage;
-            } else {
+
+            if (!currentPage.hasNext()) {
                 break;
             }
-        } while (true);
+            currentPage = hashResultRepository.findAll(currentPage.nextPageable());
+        }
     }
 
     public List<HashResult> getByHashValue(String hashValue) {
@@ -132,5 +137,12 @@ public class HashResultPersistenceService {
         BigInteger hashResultFileSizeInBytes = optionalHashResult.get().getSourceFileSizeInBytes();
 
         return !fileSizeInBytes.equals(hashResultFileSizeInBytes);
+    }
+
+    public void store(DuplicateFileReport duplicateFileReport) {
+        ReportDocument reportDocument = ReportDocument.builder()
+                .reportText(duplicateFileReport.toText()).build();
+
+        reportRepository.insert(reportDocument);
     }
 }
