@@ -3,7 +3,7 @@ package dev.alexhstone.producer;
 import dev.alexhstone.RunnableApplication;
 import dev.alexhstone.config.ApplicationConfiguration;
 import dev.alexhstone.datastore.HashResultPersistenceService;
-import dev.alexhstone.model.workitem.WorkItem;
+import dev.alexhstone.model.workitem.FileWorkItem;
 import dev.alexhstone.queue.QueuePublisher;
 import dev.alexhstone.queue.Status;
 import dev.alexhstone.util.Clock;
@@ -65,21 +65,21 @@ public class WorkItemProducer implements RunnableApplication {
         queue.destroy();
     }
 
-    private Consumer<WorkItem> publishToQueue() {
+    private Consumer<FileWorkItem> publishToQueue() {
         return workItem -> {
-            log.debug("About to publish the WorkItem with AbsolutePath: [{}]", workItem.getAbsolutePath());
+            log.debug("About to publish the FileWorkItem with AbsolutePath: [{}]", workItem.getAbsolutePath());
             Status publishStatus = queue.publish(workItem);
             if (Status.SUCCESS.equals(publishStatus)) {
-                log.debug("Successfully published the message (WorkItem) with AbsolutePath: [{}]", workItem.getAbsolutePath());
+                log.debug("Successfully published the message (FileWorkItem) with AbsolutePath: [{}]", workItem.getAbsolutePath());
             } else {
-                log.warn("Failed to publish the message (WorkItem) [{}]", workItem);
+                log.warn("Failed to publish the message (FileWorkItem) [{}]", workItem);
             }
         };
     }
 
-    private Stream<WorkItem> toStreamOfWorkItems(Path workingDirectory) {
+    private Stream<FileWorkItem> toStreamOfWorkItems(Path workingDirectory) {
         FileToWorkItemMapper fileToWorkItemMapper = new FileToWorkItemMapper(new Clock());
-        Function<File, WorkItem> toFileWorkItemMapper = fileToWorkItemMapper
+        Function<File, FileWorkItem> toFileWorkItemMapper = fileToWorkItemMapper
                 .asFunction(workingDirectory);
         PathWalker pathWalker = new PathWalker(workingDirectory);
 

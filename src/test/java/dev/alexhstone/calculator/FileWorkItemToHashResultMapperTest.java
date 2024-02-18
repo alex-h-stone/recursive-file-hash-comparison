@@ -2,7 +2,7 @@ package dev.alexhstone.calculator;
 
 import dev.alexhstone.consumer.WorkItemToHashResultMapper;
 import dev.alexhstone.model.hashresult.HashResult;
-import dev.alexhstone.model.workitem.WorkItem;
+import dev.alexhstone.model.workitem.FileWorkItem;
 import dev.alexhstone.producer.FileToWorkItemMapper;
 import dev.alexhstone.test.util.FileSystemUtils;
 import dev.alexhstone.util.Clock;
@@ -23,7 +23,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
-class WorkItemToHashResultMapperTest {
+class FileWorkItemToHashResultMapperTest {
 
     private static final Instant WORK_ITEM_CREATION_TIME =
             Instant.parse("2023-12-20T10:15:30Z");
@@ -51,16 +51,16 @@ class WorkItemToHashResultMapperTest {
     void shouldCreateFullyPopulatedFileHashResultForFileThatExists() {
         File existingFile = fileSystemUtils.createFileWithContent("existingFile.txt", "Some test file contents");
 
-        WorkItem workItem = fileToWorkItemMapper.map(temporaryDirectory, existingFile);
-        assertNotNull(workItem, "Failed precondition");
+        FileWorkItem fileWorkItem = fileToWorkItemMapper.map(temporaryDirectory, existingFile);
+        assertNotNull(fileWorkItem, "Failed precondition");
 
-        HashResult actualHashResult = mapper.map(workItem);
+        HashResult actualHashResult = mapper.map(fileWorkItem);
 
         Assertions.assertAll(
                 "Grouped Assertions of HashResult",
                 () -> assertThat("existingFile.txt", equalTo(actualHashResult.getName())),
                 () -> assertThat(actualHashResult.getAbsolutePath(), equalTo(existingFile.getAbsolutePath())),
-                () -> assertThat(actualHashResult.getAbsolutePathToWorkingDirectory(), containsStrings(workItem.getAbsolutePathToWorkingDirectory())),
+                () -> assertThat(actualHashResult.getAbsolutePathToWorkingDirectory(), containsStrings(fileWorkItem.getAbsolutePathToWorkingDirectory())),
                 () -> assertThat(actualHashResult.getRelativePath(), Matchers.isEmptyString()),
                 () -> assertThat(actualHashResult.getRelativePathToFile(), equalTo("existingFile.txt")),
                 () -> assertThat(actualHashResult.getSizeInBytes(), equalTo(BigInteger.valueOf(23))),
@@ -79,10 +79,10 @@ class WorkItemToHashResultMapperTest {
 
         File existingFile = new FileSystemUtils(childDirectory).createFileWithContent("existingFile.txt", "Some test file contents");
 
-        WorkItem workItem = fileToWorkItemMapper.map(temporaryDirectory, existingFile);
-        assertNotNull(workItem, "Failed precondition");
+        FileWorkItem fileWorkItem = fileToWorkItemMapper.map(temporaryDirectory, existingFile);
+        assertNotNull(fileWorkItem, "Failed precondition");
 
-        HashResult actualHashResult = mapper.map(workItem);
+        HashResult actualHashResult = mapper.map(fileWorkItem);
 
         Assertions.assertAll(
                 "Grouped Assertions of HashResult",
@@ -104,10 +104,10 @@ class WorkItemToHashResultMapperTest {
         Path emptyDirectory = fileSystemUtils.createDirectory("emptyDirectory");
         File emptyDirectoryAsFile = emptyDirectory.toFile();
 
-        WorkItem workItem = fileToWorkItemMapper.map(temporaryDirectory, emptyDirectoryAsFile);
-        assertNotNull(workItem, "Failed precondition");
+        FileWorkItem fileWorkItem = fileToWorkItemMapper.map(temporaryDirectory, emptyDirectoryAsFile);
+        assertNotNull(fileWorkItem, "Failed precondition");
 
-        HashResult actualHashResult = mapper.map(workItem);
+        HashResult actualHashResult = mapper.map(fileWorkItem);
 
         Assertions.assertAll(
                 "Grouped Assertions of HashResult",
@@ -132,10 +132,10 @@ class WorkItemToHashResultMapperTest {
 
         assertThat("Failed precondition", childDirectoryAsFile.listFiles(), Matchers.arrayWithSize(1));
 
-        WorkItem workItem = fileToWorkItemMapper.map(temporaryDirectory, childDirectoryAsFile);
-        assertNotNull(workItem, "Failed precondition");
+        FileWorkItem fileWorkItem = fileToWorkItemMapper.map(temporaryDirectory, childDirectoryAsFile);
+        assertNotNull(fileWorkItem, "Failed precondition");
 
-        HashResult actualHashResult = mapper.map(workItem);
+        HashResult actualHashResult = mapper.map(fileWorkItem);
 
         Assertions.assertAll(
                 "Grouped Assertions of HashResult",

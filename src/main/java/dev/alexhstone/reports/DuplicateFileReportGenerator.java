@@ -41,7 +41,6 @@ public class DuplicateFileReportGenerator implements RunnableApplication {
                     sourceHashResult.getPartitionUuid());
 
             if (!matchingHashResults.isEmpty()) {
-                // TODO should save results to a new MongoDB collection
                 log.debug("Found files which are duplicates of [{}] duplicate files are: [{}]",
                         sourceHashResult, matchingHashResults);
                 duplicateFileReport.addDuplicates(sourceHashResult, matchingHashResults);

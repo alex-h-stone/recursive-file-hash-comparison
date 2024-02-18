@@ -1,6 +1,6 @@
 package dev.alexhstone.producer;
 
-import dev.alexhstone.model.workitem.WorkItem;
+import dev.alexhstone.model.workitem.FileWorkItem;
 import dev.alexhstone.util.Clock;
 import dev.alexhstone.validation.DirectoryValidator;
 import dev.alexhstone.validation.FileValidator;
@@ -27,11 +27,11 @@ public class FileToWorkItemMapper {
         this.clock = clock;
     }
 
-    public WorkItem map(Path workingDirectory, File file) {
+    public FileWorkItem map(Path workingDirectory, File file) {
         Path validWorkingDirectory = directoryValidator.validateExists(workingDirectory);
         File fileExists = fileValidator.validateExists(file);
 
-        WorkItem workItem = WorkItem.builder()
+        FileWorkItem fileWorkItem = FileWorkItem.builder()
                 .name(fileExists.getName())
                 .absolutePath(fileExists.getAbsolutePath())
                 .absolutePathToWorkingDirectory(validWorkingDirectory.toFile().getAbsolutePath())
@@ -39,8 +39,8 @@ public class FileToWorkItemMapper {
                 .itemLastModifiedTime(determineLastModifiedTime(fileExists))
                 .workItemCreationTime(clock.getInstantNow())
                 .build();
-        log.debug("Mapped the file [{}] to the workItem: [{}]", fileExists.getAbsolutePath(), workItem);
-        return workItem;
+        log.debug("Mapped the file [{}] to the fileWorkItem: [{}]", fileExists.getAbsolutePath(), fileWorkItem);
+        return fileWorkItem;
     }
 
     private Instant determineLastModifiedTime(File fileExists) {
@@ -60,12 +60,12 @@ public class FileToWorkItemMapper {
         return fileAttributes.lastModifiedTime().toInstant();
     }
 
-    public Function<File, WorkItem> asFunction(Path workingDirectory) {
+    public Function<File, FileWorkItem> asFunction(Path workingDirectory) {
         return new Function<>() {
             private final FileToWorkItemMapper mapper = new FileToWorkItemMapper(clock);
 
             @Override
-            public WorkItem apply(File file) {
+            public FileWorkItem apply(File file) {
                 return mapper.map(workingDirectory, file);
             }
         };

@@ -7,7 +7,7 @@ public class WorkItemDeserializer {
 
     private final Gson gson = GsonFactory.getGsonInstance();
 
-    public WorkItem fromJson(String workItemJson) {
-        return gson.fromJson(workItemJson, WorkItem.class);
+    public FileWorkItem fromJson(String workItemJson) {
+        return gson.fromJson(workItemJson, FileWorkItem.class);
     }
 }

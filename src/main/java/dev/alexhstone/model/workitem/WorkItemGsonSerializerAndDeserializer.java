@@ -12,30 +12,30 @@ import java.lang.reflect.Type;
 import java.time.Instant;
 import java.util.Objects;
 
-public class WorkItemGsonSerializerAndDeserializer implements JsonSerializer<WorkItem>, JsonDeserializer<WorkItem> {
+public class WorkItemGsonSerializerAndDeserializer implements JsonSerializer<FileWorkItem>, JsonDeserializer<FileWorkItem> {
 
     @Override
-    public JsonElement serialize(WorkItem workItem,
+    public JsonElement serialize(FileWorkItem fileWorkItem,
                                  Type type,
                                  JsonSerializationContext context) {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("name", workItem.getName());
-        jsonObject.addProperty("absolutePath", workItem.getAbsolutePath());
-        jsonObject.addProperty("absolutePathToWorkingDirectory", workItem.getAbsolutePathToWorkingDirectory());
-        jsonObject.addProperty("sizeInBytes", workItem.getSizeInBytes());
-        jsonObject.addProperty("itemLastModifiedTime", toNullSafeMilliseconds(workItem.getItemLastModifiedTime()));
-        jsonObject.addProperty("workItemCreationTime", toNullSafeMilliseconds(workItem.getWorkItemCreationTime()));
+        jsonObject.addProperty("name", fileWorkItem.getName());
+        jsonObject.addProperty("absolutePath", fileWorkItem.getAbsolutePath());
+        jsonObject.addProperty("absolutePathToWorkingDirectory", fileWorkItem.getAbsolutePathToWorkingDirectory());
+        jsonObject.addProperty("sizeInBytes", fileWorkItem.getSizeInBytes());
+        jsonObject.addProperty("itemLastModifiedTime", toNullSafeMilliseconds(fileWorkItem.getItemLastModifiedTime()));
+        jsonObject.addProperty("workItemCreationTime", toNullSafeMilliseconds(fileWorkItem.getWorkItemCreationTime()));
 
         return jsonObject;
     }
 
     @Override
-    public WorkItem deserialize(JsonElement json,
-                                Type type,
-                                JsonDeserializationContext context) throws JsonParseException {
+    public FileWorkItem deserialize(JsonElement json,
+                                    Type type,
+                                    JsonDeserializationContext context) throws JsonParseException {
         JsonObject jsonObject = json.getAsJsonObject();
 
-        WorkItem workItem = WorkItem.builder()
+        FileWorkItem fileWorkItem = FileWorkItem.builder()
                 .name(jsonObject.get("name").getAsString())
                 .absolutePath(jsonObject.get("absolutePath").getAsString())
                 .absolutePathToWorkingDirectory(jsonObject.get("absolutePathToWorkingDirectory").getAsString())
@@ -44,7 +44,7 @@ public class WorkItemGsonSerializerAndDeserializer implements JsonSerializer<Wor
                 .workItemCreationTime(toNullSafeInstant(jsonObject, "workItemCreationTime"))
                 .build();
 
-        return workItem;
+        return fileWorkItem;
     }
 
     private Long toNullSafeMilliseconds(Instant instant) {

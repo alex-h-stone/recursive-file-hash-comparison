@@ -29,7 +29,7 @@ work item consumer.
 
 #### Work item consumer
 
-Responsible for dequeuing Work Item messages from the queue.
+Responsible for consuming Work Item messages from the queue.
 Each Work Item is processed to produce a Hash Result which contains a variety of file meta-data including the hash of
 the file.
 

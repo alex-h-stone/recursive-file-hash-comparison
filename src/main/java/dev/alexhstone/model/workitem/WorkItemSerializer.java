@@ -7,7 +7,7 @@ public class WorkItemSerializer {
 
     private final Gson gson = GsonFactory.getGsonInstance();
 
-    public String toJson(WorkItem workItem) {
-        return gson.toJson(workItem);
+    public String toJson(FileWorkItem fileWorkItem) {
+        return gson.toJson(fileWorkItem);
     }
 }

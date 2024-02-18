@@ -8,8 +8,7 @@ import java.time.Instant;
 
 @Value
 @Builder
-public class WorkItem {
-    // TODO consider renaming this to FileWorkItem
+public class FileWorkItem {
     String name;
     String absolutePath;
     String absolutePathToWorkingDirectory;

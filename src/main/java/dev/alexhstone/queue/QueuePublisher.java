@@ -1,8 +1,8 @@
 package dev.alexhstone.queue;
 
-import dev.alexhstone.model.workitem.WorkItem;
+import dev.alexhstone.model.workitem.FileWorkItem;
 
 public interface QueuePublisher extends QueueLifecycle {
 
-    Status publish(WorkItem workItem);
+    Status publish(FileWorkItem fileWorkItem);
 }

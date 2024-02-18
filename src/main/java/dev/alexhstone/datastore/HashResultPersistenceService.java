@@ -3,7 +3,7 @@ package dev.alexhstone.datastore;
 import dev.alexhstone.model.hashresult.HashResult;
 import dev.alexhstone.model.hashresult.HashResultDeserializer;
 import dev.alexhstone.model.hashresult.HashResultSerializer;
-import dev.alexhstone.model.workitem.WorkItem;
+import dev.alexhstone.model.workitem.FileWorkItem;
 import dev.alexhstone.reports.DuplicateFileReport;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,17 +51,17 @@ public class HashResultPersistenceService {
         }
     }
 
-    public boolean hasAlreadyBeenCalculated(WorkItem workItem) {
-        Optional<HashResult> existingHashResultOptional = getByAbsolutePath(workItem.getId());
+    public boolean hasAlreadyBeenCalculated(FileWorkItem fileWorkItem) {
+        Optional<HashResult> existingHashResultOptional = getByAbsolutePath(fileWorkItem.getId());
         if (existingHashResultOptional.isEmpty()) {
             return false;
         }
 
         HashResult existingHashResult = existingHashResultOptional.get();
 
-        boolean isWorkItemAndExistingResultSameFileSize = workItem.getSizeInBytes().equals(existingHashResult.getSizeInBytes());
+        boolean isWorkItemAndExistingResultSameFileSize = fileWorkItem.getSizeInBytes().equals(existingHashResult.getSizeInBytes());
         if (isWorkItemAndExistingResultSameFileSize) {
-            log.info("Not calculating hash result as it has already been done for [{}]", workItem.getAbsolutePath());
+            log.info("Not calculating hash result as it has already been done for [{}]", fileWorkItem.getAbsolutePath());
         }
         return isWorkItemAndExistingResultSameFileSize;
     }

@@ -4,7 +4,7 @@ import dev.alexhstone.ProgressLogging;
 import dev.alexhstone.RunnableApplication;
 import dev.alexhstone.datastore.HashResultPersistenceService;
 import dev.alexhstone.model.hashresult.HashResult;
-import dev.alexhstone.model.workitem.WorkItem;
+import dev.alexhstone.model.workitem.FileWorkItem;
 import dev.alexhstone.queue.QueueConsumer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,23 +48,23 @@ public class WorkItemConsumer implements RunnableApplication {
         log.info("About to consume work items from the queue");
         AtomicInteger numberOfContinuousUnsuccessfulDequeues = new AtomicInteger(0);
         do {
-            Optional<WorkItem> fileWorkItemOptional = queueConsumer.consumeMessage();
+            Optional<FileWorkItem> fileWorkItemOptional = queueConsumer.consumeMessage();
             if (fileWorkItemOptional.isPresent()) {
 
-                WorkItem workItem = fileWorkItemOptional.get();
-                log.debug("About to process the workItem with ID: [{}]", workItem.getId());
+                FileWorkItem fileWorkItem = fileWorkItemOptional.get();
+                log.debug("About to process the fileWorkItem with ID: [{}]", fileWorkItem.getId());
                 progressLogging.incrementProgress();
                 numberOfContinuousUnsuccessfulDequeues.set(0);
 
-                if (hashResultPersistenceService.hasAlreadyBeenCalculated(workItem)) {
+                if (hashResultPersistenceService.hasAlreadyBeenCalculated(fileWorkItem)) {
                     log.warn("Work item with Id [{}] has already been calculated so NOT processing",
-                            workItem.getId());
+                            fileWorkItem.getId());
                     continue;
                 }
 
-                HashResult hashResult = mapper.map(workItem);
+                HashResult hashResult = mapper.map(fileWorkItem);
                 hashResultPersistenceService.store(hashResult);
-                log.debug("Completed processing the work item with ID: [{}]", workItem.getId());
+                log.debug("Completed processing the work item with ID: [{}]", fileWorkItem.getId());
             } else {
                 numberOfContinuousUnsuccessfulDequeues.incrementAndGet();
             }

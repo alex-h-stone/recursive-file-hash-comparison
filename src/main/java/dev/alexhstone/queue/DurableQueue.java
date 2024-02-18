@@ -1,6 +1,6 @@
 package dev.alexhstone.queue;
 
-import dev.alexhstone.model.workitem.WorkItem;
+import dev.alexhstone.model.workitem.FileWorkItem;
 import dev.alexhstone.model.workitem.WorkItemDeserializer;
 import dev.alexhstone.model.workitem.WorkItemSerializer;
 import dev.alexhstone.util.PrettyPrintNumberFormatter;
@@ -46,9 +46,9 @@ public class DurableQueue implements QueuePublisher, QueueConsumer {
         return PrettyPrintNumberFormatter.format(longNumberToFormat);
     }
 
-    public Status publish(WorkItem workItem) {
-        String workItemAsJson = serializer.toJson(workItem);
-        return publish(workItem.getId(), workItemAsJson);
+    public Status publish(FileWorkItem fileWorkItem) {
+        String workItemAsJson = serializer.toJson(fileWorkItem);
+        return publish(fileWorkItem.getId(), workItemAsJson);
     }
 
     private Status publish(String id, String messageText) {
@@ -68,7 +68,7 @@ public class DurableQueue implements QueuePublisher, QueueConsumer {
         return Status.SUCCESS;
     }
 
-    public Optional<WorkItem> consumeMessage() {
+    public Optional<FileWorkItem> consumeMessage() {
         Message message = jmsTemplate.receive();
         if (Objects.isNull(message)) {
             log.debug("Received null message, so returning empty");
@@ -84,9 +84,9 @@ public class DurableQueue implements QueuePublisher, QueueConsumer {
             return Optional.empty();
         }
 
-        WorkItem workItem = deserializer.fromJson(messageText);
+        FileWorkItem fileWorkItem = deserializer.fromJson(messageText);
         NUMBER_OF_MESSAGES_CONSUMED.incrementAndGet();
-        log.debug("Successfully dequeued the work item with Id [{}]", workItem.getId());
-        return Optional.of(workItem);
+        log.debug("Successfully dequeued the work item with Id [{}]", fileWorkItem.getId());
+        return Optional.of(fileWorkItem);
     }
 }
