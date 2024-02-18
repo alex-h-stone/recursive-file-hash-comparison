@@ -4,8 +4,7 @@ application:
     jmsQueueName: workItems
     receiveTimeout: 1
   producer:
-    workingDirectories: F:\\Data
-  datastore: hashResults
+    workingDirectories: F:\\Data\\test folder 1;F:\\Data\\test folder 1 - Copy
 
 spring:
   activemq:

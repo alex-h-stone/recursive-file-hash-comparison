@@ -71,7 +71,10 @@ public class HashCalculator {
 
             return messageDigest;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            String message = "Unable to calculate the message digest for [%s] because of [%s]"
+                    .formatted(file.getAbsolutePath(), e.getMessage());
+            log.warn(message);
+            throw new RuntimeException(message, e);
         }
     }
 

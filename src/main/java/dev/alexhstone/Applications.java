@@ -61,6 +61,7 @@ public class Applications {
         } catch (InterruptedException e) {
             String message = "Unable to complete execution of threads due to: [%s]"
                     .formatted(e.getMessage());
+            log.warn(message);
             throw new RuntimeException(message, e);
         }
     }

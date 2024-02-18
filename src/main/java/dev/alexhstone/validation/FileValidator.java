@@ -1,9 +1,11 @@
 package dev.alexhstone.validation;
 
 import dev.alexhstone.exception.InvalidFileException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 
+@Slf4j
 public class FileValidator {
 
     private final PathValidator pathValidator = new PathValidator();
@@ -11,6 +13,7 @@ public class FileValidator {
     public File validateExists(File file) {
         if (!file.exists()) {
             String message = "The file does not exist [%s]".formatted(file.getAbsolutePath());
+            log.warn(message);
             throw new InvalidFileException(message);
         }
 
@@ -22,6 +25,7 @@ public class FileValidator {
 
         if (fileExists.isDirectory()) {
             String message = "The file is actually a directory [%s]".formatted(file.getAbsolutePath());
+            log.warn(message);
             throw new InvalidFileException(message);
         }
 

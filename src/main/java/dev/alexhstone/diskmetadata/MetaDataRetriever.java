@@ -34,6 +34,7 @@ public class MetaDataRetriever {
         if (StringUtils.isAllBlank(logicalDriveLetter)) {
             String message = "Expected valid logicalDriveLetter e.g. C but [%s] was provided"
                     .formatted(logicalDriveLetter);
+            log.warn(message);
             throw new IllegalArgumentException(message);
         }
         String singleLetterLogicalDriveIdentifier = StringUtils.substring(logicalDriveLetter, 0, 1);
@@ -54,6 +55,7 @@ public class MetaDataRetriever {
         if (matchingPartitions.size() > 1) {
             String message = "Unexpectedly found [%d] partitions matching [%s] which are [%s]"
                     .formatted(matchingPartitions.size(), logicalDriveLetter, matchingPartitions);
+            log.warn(message);
             throw new IllegalStateException(message);
         }
         PartitionAndDisk partitionAndDisk = matchingPartitions.get(0);
