@@ -3,6 +3,7 @@ package dev.alexhstone.datastore;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -13,10 +14,10 @@ import java.util.Date;
 @Document(collection = "reports")
 @Getter
 @Builder
+@ToString
 public class ReportDocument {
 
     @Id
-    @NonNull
     private String reportId;
 
     @NonNull

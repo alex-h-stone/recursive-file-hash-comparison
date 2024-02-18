@@ -143,6 +143,7 @@ public class HashResultPersistenceService {
         ReportDocument reportDocument = ReportDocument.builder()
                 .reportText(duplicateFileReport.toText()).build();
 
-        reportRepository.insert(reportDocument);
+        ReportDocument insertedReportDocument = reportRepository.insert(reportDocument);
+        log.debug("Successfully inserted the ReportDocument [{}]", insertedReportDocument);
     }
 }
