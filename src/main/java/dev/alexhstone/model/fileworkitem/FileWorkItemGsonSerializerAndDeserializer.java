@@ -1,4 +1,4 @@
-package dev.alexhstone.model.workitem;
+package dev.alexhstone.model.fileworkitem;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -12,7 +12,7 @@ import java.lang.reflect.Type;
 import java.time.Instant;
 import java.util.Objects;
 
-public class WorkItemGsonSerializerAndDeserializer implements JsonSerializer<FileWorkItem>, JsonDeserializer<FileWorkItem> {
+public class FileWorkItemGsonSerializerAndDeserializer implements JsonSerializer<FileWorkItem>, JsonDeserializer<FileWorkItem> {
 
     @Override
     public JsonElement serialize(FileWorkItem fileWorkItem,

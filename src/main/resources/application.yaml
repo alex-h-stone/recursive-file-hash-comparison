@@ -1,10 +1,10 @@
 application:
   queue:
     jmsBrokerUrl: tcp://localhost:61616
-    jmsQueueName: workItems
+    jmsQueueName: fileWorkItems
     receiveTimeout: 1
   producer:
-    workingDirectories: F:\\Data\\test folder 1;F:\\Data\\test folder 1 - Copy
+    workingDirectories: F:\\test folder 1;F:\\test folder 1 - Copy
 
 spring:
   activemq:

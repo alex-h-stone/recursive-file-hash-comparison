@@ -2,7 +2,7 @@ package dev.alexhstone.producer;
 
 import dev.alexhstone.RunnableApplication;
 import dev.alexhstone.datastore.HashResultPersistenceService;
-import dev.alexhstone.model.workitem.FileWorkItem;
+import dev.alexhstone.model.fileworkitem.FileWorkItem;
 import dev.alexhstone.queue.QueuePublisher;
 import dev.alexhstone.queue.Status;
 import dev.alexhstone.util.Clock;

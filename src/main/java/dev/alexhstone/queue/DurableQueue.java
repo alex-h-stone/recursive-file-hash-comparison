@@ -1,8 +1,8 @@
 package dev.alexhstone.queue;
 
-import dev.alexhstone.model.workitem.FileWorkItem;
-import dev.alexhstone.model.workitem.WorkItemDeserializer;
-import dev.alexhstone.model.workitem.WorkItemSerializer;
+import dev.alexhstone.model.fileworkitem.FileWorkItem;
+import dev.alexhstone.model.fileworkitem.FileWorkItemDeserializer;
+import dev.alexhstone.model.fileworkitem.FileWorkItemSerializer;
 import dev.alexhstone.util.PrettyPrintNumberFormatter;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
@@ -26,8 +26,8 @@ public class DurableQueue implements QueuePublisher, QueueConsumer {
     private static final AtomicLong NUMBER_OF_MESSAGES_PUBLISHED = new AtomicLong();
 
     private final JmsTemplate jmsTemplate;
-    private final WorkItemDeserializer deserializer = new WorkItemDeserializer();
-    private final WorkItemSerializer serializer = new WorkItemSerializer();
+    private final FileWorkItemDeserializer deserializer = new FileWorkItemDeserializer();
+    private final FileWorkItemSerializer serializer = new FileWorkItemSerializer();
 
 
     @Override

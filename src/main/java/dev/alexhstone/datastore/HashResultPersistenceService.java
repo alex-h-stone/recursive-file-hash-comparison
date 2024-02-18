@@ -1,9 +1,9 @@
 package dev.alexhstone.datastore;
 
+import dev.alexhstone.model.fileworkitem.FileWorkItem;
 import dev.alexhstone.model.hashresult.HashResult;
 import dev.alexhstone.model.hashresult.HashResultDeserializer;
 import dev.alexhstone.model.hashresult.HashResultSerializer;
-import dev.alexhstone.model.workitem.FileWorkItem;
 import dev.alexhstone.reports.DuplicateFileReport;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

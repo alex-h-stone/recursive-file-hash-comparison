@@ -1,8 +1,8 @@
 package dev.alexhstone.calculator;
 
 import dev.alexhstone.consumer.WorkItemToHashResultMapper;
+import dev.alexhstone.model.fileworkitem.FileWorkItem;
 import dev.alexhstone.model.hashresult.HashResult;
-import dev.alexhstone.model.workitem.FileWorkItem;
 import dev.alexhstone.producer.FileToWorkItemMapper;
 import dev.alexhstone.test.util.FileSystemUtils;
 import dev.alexhstone.util.Clock;

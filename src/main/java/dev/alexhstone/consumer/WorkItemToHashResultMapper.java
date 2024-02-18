@@ -1,9 +1,9 @@
 package dev.alexhstone.consumer;
 
 import dev.alexhstone.diskmetadata.MetaDataRetriever;
+import dev.alexhstone.model.fileworkitem.FileWorkItem;
 import dev.alexhstone.model.hashresult.FileSystemType;
 import dev.alexhstone.model.hashresult.HashResult;
-import dev.alexhstone.model.workitem.FileWorkItem;
 import dev.alexhstone.util.Clock;
 import dev.alexhstone.validation.FileValidator;
 import dev.alexhstone.validation.PathValidator;

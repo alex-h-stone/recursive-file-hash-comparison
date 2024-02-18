@@ -1,6 +1,6 @@
 package dev.alexhstone.producer;
 
-import dev.alexhstone.model.workitem.FileWorkItem;
+import dev.alexhstone.model.fileworkitem.FileWorkItem;
 import dev.alexhstone.test.util.FileSystemUtils;
 import dev.alexhstone.util.Clock;
 import org.apache.commons.lang3.StringUtils;

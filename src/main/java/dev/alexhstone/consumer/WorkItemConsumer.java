@@ -3,8 +3,8 @@ package dev.alexhstone.consumer;
 import dev.alexhstone.ProgressLogging;
 import dev.alexhstone.RunnableApplication;
 import dev.alexhstone.datastore.HashResultPersistenceService;
+import dev.alexhstone.model.fileworkitem.FileWorkItem;
 import dev.alexhstone.model.hashresult.HashResult;
-import dev.alexhstone.model.workitem.FileWorkItem;
 import dev.alexhstone.queue.QueueConsumer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class WorkItemConsumer implements RunnableApplication {
 
     private final WorkItemToHashResultMapper mapper = new WorkItemToHashResultMapper();
     private final ProgressLogging progressLogging =
-            new ProgressLogging("Consumed {} messages in the last {} minutes", 5);
+            new ProgressLogging("Consumed {} FileWorkItem messages", 5);
 
     private final QueueConsumer queueConsumer;
     private final HashResultPersistenceService hashResultPersistenceService;
