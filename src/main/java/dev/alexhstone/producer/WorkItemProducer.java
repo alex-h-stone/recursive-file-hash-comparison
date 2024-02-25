@@ -62,6 +62,8 @@ public class WorkItemProducer implements RunnableApplication {
                 .stream()
                 .forEach(workingDirectory -> toStreamOfWorkItems(workingDirectory)
                         .forEach(publishToQueue()));
+        log.info("Completed publishing {} FileWorkItems to the queue",
+                queue.getNumberOfMessagesPublished());
         queue.destroy();
     }
 

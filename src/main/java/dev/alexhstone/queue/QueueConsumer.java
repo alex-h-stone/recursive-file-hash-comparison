@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface QueueConsumer extends QueueLifecycle {
     Optional<FileWorkItem> consumeMessage();
+
+    long getNumberOfMessagesConsumed();
 }

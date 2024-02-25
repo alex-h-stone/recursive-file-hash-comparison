@@ -41,6 +41,16 @@ public class DurableQueue implements QueuePublisher, QueueConsumer {
         return Status.SUCCESS;
     }
 
+    @Override
+    public long getNumberOfMessagesConsumed() {
+        return NUMBER_OF_MESSAGES_CONSUMED.get();
+    }
+
+    @Override
+    public long getNumberOfMessagesPublished() {
+        return NUMBER_OF_MESSAGES_PUBLISHED.get();
+    }
+
     private String toPrettyPrint(AtomicLong atomicLongToFormat) {
         long longNumberToFormat = atomicLongToFormat.get();
         return PrettyPrintNumberFormatter.format(longNumberToFormat);
