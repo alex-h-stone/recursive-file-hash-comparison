@@ -34,6 +34,7 @@ public class DuplicateFileReportGenerator implements RunnableApplication {
      * Identify all instances where two or more files have same hash but different partition UUIDs.
      */
     public void execute() {
+        log.info("About to generate the DuplicateFileReport");
         DuplicateFileReport duplicateFileReport = new DuplicateFileReport();
         persistenceService.applyToAll(sourceHashResult -> {
             log.debug("Processing HashResult Document with absolutePath: [{}]", sourceHashResult.getAbsolutePath());
@@ -48,6 +49,8 @@ public class DuplicateFileReportGenerator implements RunnableApplication {
 
             progressLogging.incrementProgress();
         });
+        log.info("Persisting the duplicateFileReport with {} duplicated files",
+                duplicateFileReport.getNumberOfDuplicates());
         persistenceService.store(duplicateFileReport);
     }
 }

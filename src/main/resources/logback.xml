@@ -7,7 +7,6 @@
         </encoder>
     </appender>
 
-
     <appender name="Producer" class="ch.qos.logback.core.FileAppender">
         <file>workItemProducer.log</file>
         <encoder>
@@ -29,16 +28,20 @@
         </encoder>
     </appender>
 
-    <logger name="dev.alexhstone.producer.WorkItemProducer" level="info" additivity="false">
+    <logger name="dev.alexhstone.producer" level="info" additivity="false">
         <appender-ref ref="Producer"/>
     </logger>
 
-    <logger name="dev.alexhstone.consumer.WorkItemConsumer" level="info" additivity="false">
+    <logger name="dev.alexhstone.consumer" level="info" additivity="false">
         <appender-ref ref="Consumer"/>
     </logger>
 
-    <logger name="dev.alexhstone.reports" level="info" additivity="false">
+    <logger name="dev.alexhstone.reports" level="debug" additivity="false">
         <appender-ref ref="Reports"/>
+    </logger>
+
+    <logger name="dev.alexhstone" level="debug" additivity="false">
+        <appender-ref ref="Application"/>
     </logger>
 
     <root level="info">

@@ -25,4 +25,8 @@ public class DuplicateFileReport {
                 .map(DuplicatedFiles::toText)
                 .collect(Collectors.joining("\n\r"));
     }
+
+    public long getNumberOfDuplicates() {
+        return duplicated.size();
+    }
 }

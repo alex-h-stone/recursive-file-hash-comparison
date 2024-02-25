@@ -48,7 +48,7 @@ public class WorkItemProducer implements RunnableApplication {
     @Override
     public void execute() {
         List<String> workingDirectories = Arrays.asList(semicolonSeparatedWorkingDirectories.split(";"));
-        log.info("About to publish FileWorkItems from the working directories [{}] to the queue",
+        log.info("About to publish FileWorkItems from the working directories {} to the queue",
                 workingDirectories);
 
         DirectoryValidator directoryValidator = new DirectoryValidator();

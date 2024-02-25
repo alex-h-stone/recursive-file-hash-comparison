@@ -118,6 +118,8 @@ public class HashResultPersistenceService {
 
     public List<HashResult> getByHashValueAndPartitionUuid(String hashValue, String partitionUuid) {
         List<HashResultDocument> documents = hashResultRepository.findByHashValueAndPartitionUuid(hashValue, partitionUuid);
+        log.debug("Retrieved {} HashResultDocuments from the Repository with matching hashValue: [{}] partitionUuid: [{}]",
+                documents.size(), hashValue, partitionUuid);
 
         return documents.parallelStream()
                 .map(this::deserialise)
