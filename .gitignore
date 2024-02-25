@@ -1,4 +1,4 @@
-.gradle
+.gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
@@ -11,7 +11,6 @@ workItemProducer.log
 reports.log
 
 ### IntelliJ IDEA ###
-.idea
 .idea/
 *.iws
 *.iml
