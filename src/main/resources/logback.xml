@@ -7,6 +7,13 @@
         </encoder>
     </appender>
 
+    <appender name="Datastore" class="ch.qos.logback.core.FileAppender">
+        <file>datastore.log</file>
+        <encoder>
+            <pattern>%date %level [%thread] %logger %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <appender name="Producer" class="ch.qos.logback.core.FileAppender">
         <file>workItemProducer.log</file>
         <encoder>
@@ -38,6 +45,10 @@
 
     <logger name="dev.alexhstone.reports" level="debug" additivity="false">
         <appender-ref ref="Reports"/>
+    </logger>
+
+    <logger name="dev.alexhstone.datastore" level="debug" additivity="false">
+        <appender-ref ref="Datastore"/>
     </logger>
 
     <logger name="dev.alexhstone" level="debug" additivity="false">

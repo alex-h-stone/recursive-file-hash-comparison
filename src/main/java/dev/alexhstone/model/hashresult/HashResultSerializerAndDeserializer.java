@@ -21,6 +21,7 @@ public class HashResultSerializerAndDeserializer implements JsonSerializer<HashR
         jsonObject.addProperty("name", hashResult.getName());
         jsonObject.addProperty("absolutePath", hashResult.getAbsolutePath());
         jsonObject.addProperty("absolutePathToWorkingDirectory", hashResult.getAbsolutePathToWorkingDirectory());
+        jsonObject.addProperty("partitionUuid", hashResult.getPartitionUuid());
         jsonObject.addProperty("relativePath", hashResult.getRelativePath());
         jsonObject.addProperty("relativePathToFile", hashResult.getRelativePathToFile());
         jsonObject.addProperty("fileSystemType", hashResult.getFileSystemType().name());
@@ -44,6 +45,7 @@ public class HashResultSerializerAndDeserializer implements JsonSerializer<HashR
                 .name(jsonObject.get("name").getAsString())
                 .absolutePath(jsonObject.get("absolutePath").getAsString())
                 .absolutePathToWorkingDirectory(jsonObject.get("absolutePathToWorkingDirectory").getAsString())
+                .absolutePathToWorkingDirectory(jsonObject.get("partitionUuid").getAsString())
                 .relativePath(jsonObject.get("relativePath").getAsString())
                 .relativePathToFile(jsonObject.get("relativePathToFile").getAsString())
                 .fileSystemType(FileSystemType.valueOf(jsonObject.get("fileSystemType").getAsString()))
