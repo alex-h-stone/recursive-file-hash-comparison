@@ -43,3 +43,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+application.log
+datastore.log
+application.log
