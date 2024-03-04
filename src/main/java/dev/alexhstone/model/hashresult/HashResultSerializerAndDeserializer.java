@@ -45,7 +45,7 @@ public class HashResultSerializerAndDeserializer implements JsonSerializer<HashR
                 .name(jsonObject.get("name").getAsString())
                 .absolutePath(jsonObject.get("absolutePath").getAsString())
                 .absolutePathToWorkingDirectory(jsonObject.get("absolutePathToWorkingDirectory").getAsString())
-                .absolutePathToWorkingDirectory(jsonObject.get("partitionUuid").getAsString())
+                .partitionUuid(jsonObject.get("partitionUuid").getAsString())
                 .relativePath(jsonObject.get("relativePath").getAsString())
                 .relativePathToFile(jsonObject.get("relativePathToFile").getAsString())
                 .fileSystemType(FileSystemType.valueOf(jsonObject.get("fileSystemType").getAsString()))
