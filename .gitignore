@@ -6,9 +6,9 @@ build/
 
 ### Application Logs ###
 application.log
+datastore.log
 workItemConsumer.log
 workItemProducer.log
-reports.log
 
 ### IntelliJ IDEA ###
 .idea/
@@ -43,6 +43,4 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-application.log
 datastore.log
-application.log
