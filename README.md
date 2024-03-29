@@ -33,13 +33,12 @@ Responsible for consuming Work Item messages from the queue.
 Each Work Item is processed to produce a Hash Result which contains a variety of file meta-data including the hash of
 the file.
 
-All hash results are deserialised into JSON and persisted in a MongoDB collection and indexed on a number of fields
+All hash results are serialised into JSON and persisted in a MongoDB collection and indexed on a number of fields
 including the hash.
 
-## Extra
+## TODO - Implement
 
-on startup publish and consumer to a test queue
-and store and retrieve to a test collection
+On startup publish and consumer to a test queue and store and retrieve to a test collection.
 
 Comparison Report Generator
 Given data stored in the MongoDb - generate comparison reports
@@ -68,7 +67,9 @@ Given data stored in the MongoDb - generate comparison reports
 5. Or, can run from a jar e.g.
    java -jar abc.jar --consumer
 
-The file hashes and other details are then stored in Mongo DB for subsequently producing a variety of reports including:
+The file hashes and other details are then stored in Mongo DB for subsequently producing a variety of reports
+
+### Reports
 
 - Identical files; with identical name or hash
 - Files with matching relative path and name but differing hashes

@@ -41,11 +41,13 @@ public class WorkItemToHashResultMapper {
         Path pathToWorkingDirectory = pathValidator.validateExists(absolutePathToWorkingDirectoryString);
         Path relativePath = pathToWorkingDirectory.relativize(pathToWorkItem.getParent());
 
+        String partitionUuid = metaDataRetriever.retrievePartitionUuid(absolutePathString);
+
         return HashResult.builder()
                 .name(fileWorkItem.getName())
                 .absolutePath(absolutePathString)
                 .absolutePathToWorkingDirectory(absolutePathToWorkingDirectoryString)
-                .partitionUuid(metaDataRetriever.retrievePartitionUuid(absolutePathString))
+                .partitionUuid(partitionUuid)
                 .relativePath(relativePath.toString())
                 .relativePathToFile(pathToWorkingDirectory.relativize(pathToWorkItem).toString())
                 .fileSystemType(FileSystemType.valueOfFile(file))

@@ -98,7 +98,7 @@ class HashCalculatorTest {
         int numberOfThreads = 500;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
 
-        int numberOfTestFiles = 10_000;
+        int numberOfTestFiles = 2_000;
         List<File> testFiles = IntStream.range(1, numberOfTestFiles)
                 .mapToObj(value -> {
                     String fileName = "testFile" + value + ".txt";

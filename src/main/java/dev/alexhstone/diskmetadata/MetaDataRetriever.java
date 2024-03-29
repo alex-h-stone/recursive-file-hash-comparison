@@ -7,9 +7,11 @@ import oshi.hardware.HWDiskStore;
 import oshi.hardware.HWPartition;
 import oshi.hardware.HardwareAbstractionLayer;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,37 +32,32 @@ public class MetaDataRetriever {
      *                           e.g. for C:\ the logicalDriveLetter is C
      * @return PartitionMetaData
      */
-    public Optional<PartitionMetaData> retrieveMetaDataFor(String logicalDriveLetter) {
+    public List<PartitionMetaData> retrieveMetaDataFor(String logicalDriveLetter) {
         if (StringUtils.isAllBlank(logicalDriveLetter)) {
-            String message = "Expected valid logicalDriveLetter e.g. C but [%s] was provided"
+            String message = "Expected valid logicalDriveLetter e.g. C but found [%s]"
                     .formatted(logicalDriveLetter);
             log.warn(message);
             throw new IllegalArgumentException(message);
         }
+
+        List<HWDiskStore> allDisks = retrieveDisks();
+
+        List<PartitionAndDisk> allPartitionsEachWithAssociatedDisk = retrievePartitionsWithDisks(allDisks);
+
         String singleLetterLogicalDriveIdentifier = StringUtils.substring(logicalDriveLetter, 0, 1);
-
-        List<HWDiskStore> diskStores = retrieveDisks();
-
-        List<PartitionAndDisk> partitionsAndDisks = retrievePartitionsWithDisks(diskStores);
-
-        List<PartitionAndDisk> matchingPartitions = partitionsAndDisks
+        List<PartitionAndDisk> matchingPartitions = allPartitionsEachWithAssociatedDisk
                 .stream()
                 .filter(o -> StringUtils.containsIgnoreCase(o.partition().getMountPoint(), singleLetterLogicalDriveIdentifier))
                 .toList();
 
         if (matchingPartitions.isEmpty()) {
-            return Optional.empty();
+            log.info("Found no matching partitions for logical drive: [{}]", logicalDriveLetter);
+            return Collections.emptyList();
         }
 
-        if (matchingPartitions.size() > 1) {
-            String message = "Unexpectedly found [%d] partitions matching [%s] which are [%s]"
-                    .formatted(matchingPartitions.size(), logicalDriveLetter, matchingPartitions);
-            log.warn(message);
-            throw new IllegalStateException(message);
-        }
-        PartitionAndDisk partitionAndDisk = matchingPartitions.get(0);
-
-        return Optional.of(createPartitionMetaData(partitionAndDisk));
+        return matchingPartitions.stream()
+                .map(TO_PARTITION_META_DATA)
+                .collect(Collectors.toList());
     }
 
     private List<PartitionAndDisk> retrievePartitionsWithDisks(List<HWDiskStore> diskStores) {
@@ -84,31 +81,43 @@ public class MetaDataRetriever {
         return diskStores;
     }
 
-    private PartitionMetaData createPartitionMetaData(PartitionAndDisk partitionAndDisk) {
-        HWDiskStore diskStore = partitionAndDisk.disk;
-        HWPartition partition = partitionAndDisk.partition;
-        return PartitionMetaData.builder()
-                .diskName(trim(diskStore.getName()))
-                .diskModel(trim(diskStore.getModel()))
-                .diskSerialNumber(trim(diskStore.getSerial()))
-                .mountPoint(trim(partition.getMountPoint()))
-                .type(trim(partition.getType()))
-                .name(trim(partition.getName()))
-                .identifier(trim(partition.getIdentification()))
-                .uuid(trim(partition.getUuid()))
-                .build();
-    }
 
-    private String trim(String stringToBeTrimmed) {
+    private static final Function<PartitionAndDisk, PartitionMetaData> TO_PARTITION_META_DATA =
+            partitionAndDisk -> {
+                HWDiskStore diskStore = partitionAndDisk.disk;
+                HWPartition partition = partitionAndDisk.partition;
+                return PartitionMetaData.builder()
+                        .diskName(trim(diskStore.getName()))
+                        .diskModel(trim(diskStore.getModel()))
+                        .diskSerialNumber(trim(diskStore.getSerial()))
+                        .mountPoint(trim(partition.getMountPoint()))
+                        .type(trim(partition.getType()))
+                        .name(trim(partition.getName()))
+                        .identifier(trim(partition.getIdentification()))
+                        .uuid(trim(partition.getUuid()))
+                        .build();
+            };
+
+
+    private static String trim(String stringToBeTrimmed) {
         return StringUtils.trim(stringToBeTrimmed);
     }
 
     public String retrievePartitionUuid(String partitionMountPointLetter) {
-        Optional<PartitionMetaData> partitionMetaDataOptional = retrieveMetaDataFor(partitionMountPointLetter);
-        if (partitionMetaDataOptional.isEmpty()) {
-            return "Unknown Partition UUID from [%s]".formatted(partitionMountPointLetter);
+        SortedSet<String> uniquePartitionUuids = retrieveMetaDataFor(partitionMountPointLetter)
+                .stream()
+                .map(PartitionMetaData::getUuid)
+                .collect(Collectors.toCollection(TreeSet::new));
+
+        if (uniquePartitionUuids.isEmpty()) {
+            throw new IllegalStateException("Unknown Partition UUID for [%s]".formatted(partitionMountPointLetter));
         }
-        return partitionMetaDataOptional.get().getUuid();
+
+        if (uniquePartitionUuids.size() == 1) {
+            return uniquePartitionUuids.first();
+        }
+
+        return String.join("_", uniquePartitionUuids);
     }
 
     private record PartitionAndDisk(HWPartition partition, HWDiskStore disk) {
