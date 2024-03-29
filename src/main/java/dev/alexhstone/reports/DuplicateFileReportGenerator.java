@@ -30,6 +30,11 @@ public class DuplicateFileReportGenerator implements RunnableApplication {
         return "duplicateFilesReport";
     }
 
+    @Override
+    public int getNumberOfThreadsToUseForExecution() {
+        return 1;
+    }
+
     /**
      * Identify all instances where two or more files have same hash but different partition UUIDs.
      */

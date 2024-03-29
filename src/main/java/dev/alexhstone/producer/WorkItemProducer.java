@@ -46,6 +46,11 @@ public class WorkItemProducer implements RunnableApplication {
     }
 
     @Override
+    public int getNumberOfThreadsToUseForExecution() {
+        return 1;
+    }
+
+    @Override
     public void execute() {
         List<String> workingDirectories = Arrays.asList(semicolonSeparatedWorkingDirectories.split(";"));
         log.info("About to publish FileWorkItems from the working directories {} to the queue",

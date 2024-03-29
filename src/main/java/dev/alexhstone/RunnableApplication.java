@@ -8,12 +8,5 @@ public interface RunnableApplication {
 
     String getApplicationName();
 
-    /**
-     * Default is a single thread.
-     *
-     * @return The number of threads to use when executing this application.
-     */
-    default int getNumberOfThreadsToUseForExecution() {
-        return 1;
-    }
+    int getNumberOfThreadsToUseForExecution();
 }

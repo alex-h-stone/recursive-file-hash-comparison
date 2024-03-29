@@ -22,7 +22,7 @@ public class WorkItemConsumer implements RunnableApplication {
 
     private final WorkItemToHashResultMapper mapper = new WorkItemToHashResultMapper();
     private final ProgressLogging progressLogging =
-            new ProgressLogging("Consumed {} FileWorkItem messages", 5);
+            new ProgressLogging("Consumed {} FileWorkItem messages", 200);
 
     private final QueueConsumer queueConsumer;
     private final HashResultPersistenceService hashResultPersistenceService;

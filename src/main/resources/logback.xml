@@ -43,15 +43,15 @@
         <appender-ref ref="Consumer"/>
     </logger>
 
-    <logger name="dev.alexhstone.reports" level="debug" additivity="false">
+    <logger name="dev.alexhstone.reports" level="info" additivity="false">
         <appender-ref ref="Reports"/>
     </logger>
 
-    <logger name="dev.alexhstone.datastore" level="debug" additivity="false">
+    <logger name="dev.alexhstone.datastore" level="info" additivity="false">
         <appender-ref ref="Datastore"/>
     </logger>
 
-    <logger name="dev.alexhstone" level="debug" additivity="false">
+    <logger name="dev.alexhstone" level="info" additivity="false">
         <appender-ref ref="Application"/>
     </logger>
 
